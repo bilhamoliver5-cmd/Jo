@@ -1,352 +1,774 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Strath Property Group — Dashboard</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Strath Property Group — Operations Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --navy: #0f2040;
-      --navy-mid: #1a3360;
-      --gold: #c8a84b;
-      --gold-light: #e8c96a;
-      --green: #2e7d4f;
-      --green-light: #3fa36a;
-      --amber: #d48a00;
-      --red: #c0392b;
-      --bg: #f4f6f9;
-      --card: #ffffff;
-      --border: #dde3ed;
-      --text: #1a2540;
-      --muted: #6b7a99;
-      --radius: 10px;
+      /* Brand colours extracted from logo */
+      --charcoal:    #1C2B3A;   /* primary dark */
+      --charcoal-mid:#243447;
+      --gold:        #B8965A;   /* champagne gold from roof/lines */
+      --gold-light:  #D4AE78;
+      --gold-pale:   #F0E6D3;
+      --cream:       #F7F4EF;   /* off-white background */
+      --cream-dark:  #EDE9E2;
+      --white:       #FFFFFF;
+      --slate:       #5A6B7D;
+      --slate-light: #8A9BAD;
+      --green:       #2D6A4F;
+      --green-light: #40916C;
+      --amber:       #B5730A;
+      --red:         #9B2335;
+      --border:      #DDD8D0;
+      --shadow:      rgba(28,43,58,0.08);
     }
 
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    html { scroll-behavior: smooth; }
 
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--charcoal);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ─────────────────────────────────────────
+       TOPBAR
+    ───────────────────────────────────────── */
+    .topbar {
+      background: var(--charcoal);
+      height: 3px;
+      background: linear-gradient(90deg, var(--charcoal) 0%, var(--gold) 50%, var(--charcoal) 100%);
+    }
+
+    /* ─────────────────────────────────────────
+       HEADER
+    ───────────────────────────────────────── */
     header {
-      background: var(--navy);
-      padding: 0 32px;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 64px;
-      border-bottom: 3px solid var(--gold);
+      background: var(--charcoal);
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 80px;
+      position: relative;
+      overflow: hidden;
     }
-    .header-left { display: flex; align-items: center; gap: 16px; }
-    .logo-box {
-      background: var(--gold); color: var(--navy);
-      font-weight: 800; font-size: 18px;
-      width: 44px; height: 44px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
-    .company-name { color: #fff; font-size: 18px; font-weight: 700; }
-    .company-sub { color: var(--gold); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
-    .header-right { color: #8ea8c8; font-size: 13px; }
-    .header-right strong { color: #fff; }
-
-    .page { max-width: 1440px; margin: 0 auto; padding: 28px 32px 48px; }
-
-    .section-title {
-      font-size: 13px; font-weight: 700; letter-spacing: 1.4px;
-      text-transform: uppercase; color: var(--muted);
-      margin-bottom: 14px; padding-bottom: 6px;
-      border-bottom: 2px solid var(--border);
+    .header-logo img {
+      height: 52px;
+      display: block;
     }
-
-    /* ── Editable number ── */
-    .editable {
-      cursor: pointer;
-      border-bottom: 2px dashed var(--gold);
-      display: inline-block;
-      min-width: 20px;
-      transition: background 0.15s;
-      border-radius: 3px;
-      padding: 0 2px;
-    }
-    .editable:hover { background: rgba(200,168,75,0.15); }
-    .editable-input {
-      font-size: inherit; font-weight: inherit; font-family: inherit;
-      color: inherit; border: 2px solid var(--gold);
-      border-radius: 4px; background: #fffbe6;
-      width: 80px; outline: none; padding: 2px 4px;
+    .header-center {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
       text-align: center;
     }
-    .edit-hint {
-      font-size: 11px; color: var(--gold); font-style: italic;
-      text-align: right; margin-bottom: 6px; margin-top: -6px;
+    .dash-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .header-right {
+      text-align: right;
+    }
+    .header-right .phase {
+      font-size: 11px;
+      color: var(--slate-light);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .header-right .phase strong { color: var(--gold-light); font-weight: 600; }
+    .header-date {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      color: var(--gold);
+      letter-spacing: 0.5px;
     }
 
-    /* ── KPI Grid ── */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 14px; margin-bottom: 28px;
+    /* ─────────────────────────────────────────
+       NAV TABS
+    ───────────────────────────────────────── */
+    .nav-tabs {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      padding: 0 48px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px var(--shadow);
     }
-    @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(3,1fr); } }
-    @media (max-width: 680px)  { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+    .nav-tab {
+      padding: 16px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--slate);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .nav-tab:hover { color: var(--charcoal); }
+    .nav-tab.active { color: var(--charcoal); border-bottom-color: var(--gold); }
 
-    .kpi-card {
-      background: var(--card); border-radius: var(--radius);
-      padding: 18px 20px 16px;
-      border: 1px solid var(--border);
-      position: relative; overflow: hidden;
-    }
-    .kpi-card::before {
-      content: ''; position: absolute;
-      top: 0; left: 0; right: 0; height: 3px;
-      background: var(--gold);
-    }
-    .kpi-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-    .kpi-value { font-size: 32px; font-weight: 800; color: var(--text); line-height: 1; }
-    .kpi-target { font-size: 12px; color: var(--muted); margin-top: 6px; }
-    .kpi-target span { font-weight: 600; }
-    .kpi-badge {
-      display: inline-block; font-size: 10px; font-weight: 700;
-      padding: 2px 8px; border-radius: 20px; margin-top: 8px;
-      text-transform: uppercase; letter-spacing: 0.6px;
-    }
-    .badge-green { background: #e6f4ed; color: var(--green); }
-    .badge-amber { background: #fff3e0; color: var(--amber); }
-    .badge-red   { background: #fdecea; color: var(--red); }
-    .badge-grey  { background: #eef0f5; color: var(--muted); }
+    /* ─────────────────────────────────────────
+       PAGE + SECTIONS
+    ───────────────────────────────────────── */
+    .page { max-width: 1440px; margin: 0 auto; padding: 36px 48px 64px; }
 
-    /* ── Layouts ── */
-    .two-col   { display: grid; grid-template-columns: 1fr 1fr;       gap: 20px; margin-bottom: 28px; }
-    .three-col { display: grid; grid-template-columns: 2fr 1fr 1fr;   gap: 20px; margin-bottom: 28px; }
-    @media (max-width: 900px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+    .tab-section { display: none; }
+    .tab-section.active { display: block; }
 
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--charcoal);
+      letter-spacing: 0.3px;
+    }
+    .section-header .sub {
+      font-size: 12px;
+      color: var(--slate-light);
+      letter-spacing: 0.5px;
+    }
+
+    .sub-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--slate-light);
+      margin-bottom: 14px;
+    }
+
+    /* ─────────────────────────────────────────
+       CARDS
+    ───────────────────────────────────────── */
     .card {
-      background: var(--card); border-radius: var(--radius);
-      border: 1px solid var(--border); padding: 20px 22px;
+      background: var(--white);
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+      box-shadow: 0 2px 8px var(--shadow);
     }
     .card-title {
-      font-size: 14px; font-weight: 700; color: var(--text);
-      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .card-title .icon {
-      width: 28px; height: 28px; border-radius: 6px;
-      background: var(--navy); color: var(--gold);
-      font-size: 14px; display: flex; align-items: center; justify-content: center;
+    .card-title::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 18px;
+      background: var(--gold);
+      border-radius: 2px;
+      flex-shrink: 0;
     }
 
-    /* ── Progress ── */
-    .progress-wrap { margin-bottom: 14px; }
-    .progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
-    .progress-label .pl { color: var(--muted); font-weight: 500; }
-    .progress-label .pr { font-weight: 700; color: var(--text); }
-    .progress-bar { height: 8px; background: #eef2fa; border-radius: 20px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 20px; background: var(--gold); transition: width 0.4s; }
-    .progress-fill.green { background: var(--green-light); }
+    /* ─────────────────────────────────────────
+       GRIDS
+    ───────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+    .grid-6 { display: grid; grid-template-columns: repeat(6,1fr); gap: 14px; margin-bottom: 24px; }
+    @media (max-width: 1200px) { .grid-6 { grid-template-columns: repeat(3,1fr); } .grid-4 { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 900px)  { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
 
-    /* ── Roadmap ── */
-    .roadmap { display: flex; flex-direction: column; }
-    .road-item { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid #f0f3f8; }
-    .road-item:last-child { border-bottom: none; }
-    .road-dot-col { display: flex; flex-direction: column; align-items: center; width: 28px; flex-shrink: 0; padding-top: 2px; }
-    .road-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border); background: #fff; flex-shrink: 0; }
+    /* ─────────────────────────────────────────
+       KPI STAT CARDS
+    ───────────────────────────────────────── */
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px 22px 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+    }
+    .stat-card.green::before  { background: var(--green); }
+    .stat-card.amber::before  { background: var(--amber); }
+    .stat-card.red::before    { background: var(--red); }
+    .stat-card .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--slate-light);
+      margin-bottom: 10px;
+    }
+    .stat-card .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--charcoal);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-card .stat-meta {
+      font-size: 11px;
+      color: var(--slate-light);
+    }
+    .stat-card .stat-meta strong { color: var(--slate); }
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 2px;
+      margin-top: 10px;
+    }
+    .badge-gold   { background: var(--gold-pale); color: var(--gold); }
+    .badge-green  { background: #E8F5EE; color: var(--green); }
+    .badge-amber  { background: #FDF3E3; color: var(--amber); }
+    .badge-red    { background: #F9EBed; color: var(--red); }
+    .badge-slate  { background: var(--cream-dark); color: var(--slate); }
+
+    /* ─────────────────────────────────────────
+       EDITABLE
+    ───────────────────────────────────────── */
+    .editable {
+      cursor: pointer;
+      border-bottom: 1px dashed var(--gold);
+      display: inline-block;
+      transition: background 0.15s;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+    .editable:hover { background: var(--gold-pale); }
+    .editable-input {
+      font: inherit;
+      color: var(--charcoal);
+      border: 1px solid var(--gold);
+      border-radius: 3px;
+      background: #FFFDF8;
+      outline: none;
+      padding: 1px 6px;
+      width: 90px;
+      text-align: center;
+    }
+
+    /* ─────────────────────────────────────────
+       PROGRESS BARS
+    ───────────────────────────────────────── */
+    .prog-row { margin-bottom: 16px; }
+    .prog-row:last-child { margin-bottom: 0; }
+    .prog-labels { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+    .prog-labels .pl { color: var(--slate); font-weight: 500; }
+    .prog-labels .pr { font-weight: 700; color: var(--charcoal); }
+    .prog-track { height: 5px; background: var(--cream-dark); border-radius: 10px; overflow: hidden; }
+    .prog-fill  { height: 100%; border-radius: 10px; background: var(--gold); transition: width 0.5s ease; }
+    .prog-fill.green { background: var(--green); }
+
+    /* ─────────────────────────────────────────
+       PIPELINE TABLE
+    ───────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--slate-light);
+      padding: 0 14px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table th:first-child { padding-left: 0; }
+    .data-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--cream-dark);
+      vertical-align: middle;
+      font-size: 13px;
+    }
+    .data-table td:first-child { padding-left: 0; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover td { background: var(--cream); }
+
+    .deal-id {
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--charcoal);
+      background: var(--cream-dark);
+      padding: 3px 8px;
+      border-radius: 2px;
+      letter-spacing: 0.5px;
+      display: inline-block;
+    }
+    .yield-tag {
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .yield-high { background: #E8F5EE; color: var(--green); }
+    .yield-mid  { background: #FDF3E3; color: var(--amber); }
+    .yield-low  { background: #F9EBED; color: var(--red); }
+
+    .status-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; padding: 4px 10px; border-radius: 2px;
+      display: inline-block;
+    }
+    .s-sourcing    { background: #EBF2FF; color: #2855A8; }
+    .s-assessing   { background: #FDF3E3; color: var(--amber); }
+    .s-packaged    { background: #E8F5EE; color: var(--green); }
+    .s-distributed { background: #E8F5EE; color: var(--green); }
+    .s-offer       { background: var(--gold-pale); color: var(--gold); }
+    .s-closed      { background: var(--charcoal); color: var(--gold); }
+
+    /* ─────────────────────────────────────────
+       TIER CARDS
+    ───────────────────────────────────────── */
+    .tier-badge {
+      display: inline-block;
+      font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 2px; margin-bottom: 12px;
+    }
+    .tier-1 { background: var(--charcoal); color: var(--gold); }
+    .tier-2 { background: var(--cream-dark); color: var(--slate); }
+    .tier-3 { background: var(--cream-dark); color: var(--slate-light); }
+
+    .area-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .area-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--charcoal); margin-bottom: 4px; }
+    .area-postcode { font-size: 11px; color: var(--slate-light); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
+    .area-yield { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--green); margin-bottom: 4px; }
+    .area-yield.mid { color: var(--amber); }
+    .area-yield.low { color: var(--red); }
+    .area-stat { font-size: 12px; color: var(--slate); margin-bottom: 4px; }
+    .area-stat strong { color: var(--charcoal); }
+
+    /* ─────────────────────────────────────────
+       ROADMAP
+    ───────────────────────────────────────── */
+    .roadmap { position: relative; padding-left: 32px; }
+    .roadmap::before {
+      content: '';
+      position: absolute;
+      left: 7px; top: 8px; bottom: 8px;
+      width: 1px;
+      background: var(--border);
+    }
+    .road-item { position: relative; margin-bottom: 28px; }
+    .road-item:last-child { margin-bottom: 0; }
+    .road-dot {
+      position: absolute;
+      left: -32px; top: 4px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--white);
+    }
     .road-dot.done   { background: var(--green); border-color: var(--green); }
-    .road-dot.active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 4px #e8c96a33; }
-    .road-line { width: 2px; flex: 1; background: var(--border); margin-top: 4px; min-height: 24px; }
-    .road-item:last-child .road-line { display: none; }
-    .road-month { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
-    .road-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .road-title.active-title { color: var(--gold); }
-    .road-title.goal-title   { color: var(--green); }
-    .road-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
-    .road-milestone { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .milestone-tag { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; background: #eef2fa; color: var(--navy-mid); }
-    .milestone-tag.done { background: #e6f4ed; color: var(--green); }
+    .road-dot.active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 4px var(--gold-pale); }
+    .road-month { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-light); margin-bottom: 3px; }
+    .road-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: var(--charcoal); margin-bottom: 4px; }
+    .road-title.active { color: var(--gold); }
+    .road-title.goal   { color: var(--green); }
+    .road-desc { font-size: 12px; color: var(--slate); line-height: 1.6; margin-bottom: 8px; }
+    .road-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .road-tag { font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 2px; background: var(--cream-dark); color: var(--slate); }
+    .road-tag.done { background: #E8F5EE; color: var(--green); }
 
-    /* ── Pipeline Table ── */
-    .pipeline-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .pipeline-table th {
-      text-align: left; font-size: 11px; font-weight: 700;
-      letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted);
-      padding: 0 12px 10px; border-bottom: 2px solid var(--border);
+    /* ─────────────────────────────────────────
+       MODEL ROWS
+    ───────────────────────────────────────── */
+    .model-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 12px; border-radius: 3px; margin-bottom: 5px;
+      background: var(--cream);
     }
-    .pipeline-table td { padding: 12px; border-bottom: 1px solid #f0f3f8; vertical-align: middle; }
-    .pipeline-table tr:last-child td { border-bottom: none; }
-    .pipeline-table tr:hover td { background: #f8f9fd; }
-    .deal-id { font-weight: 700; font-size: 12px; color: var(--navy); background: #eef2fa; padding: 3px 8px; border-radius: 5px; display: inline-block; }
-    .yield-pill { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-size: 13px; padding: 3px 10px; border-radius: 20px; }
-    .yield-high { background: #e6f4ed; color: var(--green); }
-    .yield-mid  { background: #fff3e0; color: var(--amber); }
-    .yield-low  { background: #fdecea; color: var(--red); }
-    .status-pill { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
-    .status-sourcing  { background: #e8f0fe; color: #1a56db; }
-    .status-analysing { background: #fff3e0; color: var(--amber); }
-    .status-packaged  { background: #e6f4ed; color: var(--green); }
-    .status-closed    { background: var(--navy); color: var(--gold); }
+    .model-row.output { background: var(--charcoal); }
+    .model-key { font-size: 12px; color: var(--slate); }
+    .model-row.output .model-key { color: var(--slate-light); }
+    .model-val { font-weight: 700; font-size: 13px; color: var(--charcoal); }
+    .model-row.output .model-val { color: var(--white); }
+    .model-val.green { color: var(--green); }
+    .model-val.amber { color: var(--amber); }
+    .model-row.output .model-val.green { color: #6FCF97; }
+    .model-row.output .model-val.amber { color: #F2994A; }
 
-    /* ── Analysis ── */
-    .analysis-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 7px; background: #f8f9fd; font-size: 13px; margin-bottom: 6px; }
-    .analysis-row .akey { color: var(--muted); font-size: 12px; }
-    .analysis-row .aval { font-weight: 700; color: var(--text); }
-    .analysis-row .aval.green { color: var(--green); }
-    .analysis-row .aval.amber { color: var(--amber); }
-
-    /* ── Chart ── */
-    .chart-wrap { position: relative; height: 200px; }
-
-    /* ── Resp table ── */
-    .resp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .resp-table th { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); padding: 0 10px 8px; border-bottom: 2px solid var(--border); text-align: left; }
-    .resp-table td { padding: 9px 10px; border-bottom: 1px solid #f0f3f8; }
-    .owner-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
-    .owner-joe    { background: #e8f0fe; color: #1a56db; }
-    .owner-ciaran { background: #fce8ff; color: #8030b0; }
-    .owner-both   { background: #e6f4ed; color: var(--green); }
-
-    .dash-footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
-
-    /* ── Add deal form ── */
-    .add-deal-btn {
-      background: var(--navy); color: var(--gold);
-      border: none; border-radius: 7px; padding: 8px 18px;
-      font-size: 13px; font-weight: 700; cursor: pointer;
-      margin-bottom: 16px; letter-spacing: 0.4px;
+    /* ─────────────────────────────────────────
+       PIPELINE ADD FORM
+    ───────────────────────────────────────── */
+    .add-btn {
+      background: var(--charcoal); color: var(--gold);
+      border: 1px solid var(--gold); border-radius: 3px;
+      padding: 8px 20px; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.8px; text-transform: uppercase;
+      cursor: pointer; margin-bottom: 18px;
+      transition: background 0.15s;
     }
-    .add-deal-btn:hover { background: var(--navy-mid); }
-    .add-deal-form {
-      display: none; background: #f8f9fd; border-radius: 8px;
-      padding: 16px; margin-bottom: 16px; border: 1px solid var(--border);
+    .add-btn:hover { background: var(--charcoal-mid); }
+    .deal-form {
+      display: none; background: var(--cream); border: 1px solid var(--border);
+      border-radius: 4px; padding: 18px; margin-bottom: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 12px; align-items: end;
     }
-    .add-deal-form.open { display: grid; grid-template-columns: repeat(4,1fr) auto; gap: 10px; align-items: end; }
-    .form-field { display: flex; flex-direction: column; gap: 4px; }
-    .form-field label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.7px; }
-    .form-field input, .form-field select {
-      border: 1px solid var(--border); border-radius: 6px;
-      padding: 7px 10px; font-size: 13px; outline: none;
-      font-family: inherit; background: #fff;
+    .deal-form.open { display: grid; }
+    .ff { display: flex; flex-direction: column; gap: 5px; }
+    .ff label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--slate); }
+    .ff input, .ff select {
+      border: 1px solid var(--border); border-radius: 3px;
+      padding: 8px 10px; font-size: 13px; font-family: inherit;
+      background: var(--white); color: var(--charcoal); outline: none;
     }
-    .form-field input:focus, .form-field select:focus { border-color: var(--gold); }
-    .form-submit { background: var(--green); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
-    .form-submit:hover { background: var(--green-light); }
-    .del-deal { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 16px; padding: 4px 8px; border-radius: 4px; }
-    .del-deal:hover { background: #fdecea; }
+    .ff input:focus, .ff select:focus { border-color: var(--gold); }
+    .ff-submit {
+      background: var(--green); color: var(--white); border: none;
+      border-radius: 3px; padding: 9px 18px; font-weight: 700;
+      font-size: 12px; cursor: pointer; white-space: nowrap; letter-spacing: 0.5px;
+    }
+    .del-row { background: none; border: none; color: var(--red); cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 2px; opacity: 0.5; }
+    .del-row:hover { opacity: 1; background: #F9EBED; }
 
-    /* ── Status select in table ── */
-    .status-select { border: none; background: transparent; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 6px; border-radius: 20px; appearance: none; -webkit-appearance: none; outline: none; }
+    /* ─────────────────────────────────────────
+       RESPONSIBILITY TABLE
+    ───────────────────────────────────────── */
+    .owner { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .own-joe    { background: #EBF2FF; color: #2855A8; }
+    .own-ciaran { background: #F4EBFF; color: #6B21A8; }
+    .own-both   { background: var(--gold-pale); color: var(--gold); }
+
+    /* ─────────────────────────────────────────
+       CRITERIA TABLE
+    ───────────────────────────────────────── */
+    .crit-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; border-radius: 3px; margin-bottom: 5px;
+      border-left: 2px solid var(--gold);
+      background: var(--cream);
+    }
+    .crit-key { font-size: 12px; color: var(--slate); }
+    .crit-val { font-weight: 700; font-size: 13px; color: var(--charcoal); }
+    .crit-val.g { color: var(--green); }
+
+    /* ─────────────────────────────────────────
+       PIPELINE STAGES
+    ───────────────────────────────────────── */
+    .stage-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .stage-chip {
+      font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 2px;
+      background: var(--cream-dark); color: var(--slate);
+    }
+    .stage-arrow { color: var(--slate-light); font-size: 14px; }
+
+    /* ─────────────────────────────────────────
+       CHART WRAPPERS
+    ───────────────────────────────────────── */
+    .chart-wrap { position: relative; height: 220px; }
+    .chart-wrap-sm { position: relative; height: 180px; }
+
+    /* ─────────────────────────────────────────
+       EDIT HINT
+    ───────────────────────────────────────── */
+    .edit-hint {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--gold-pale); border: 1px solid var(--gold-light);
+      border-radius: 3px; padding: 10px 16px; margin-bottom: 24px;
+      font-size: 12px; color: var(--gold); font-style: italic;
+    }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    footer {
+      background: var(--charcoal);
+      text-align: center;
+      padding: 24px 48px;
+      margin-top: 48px;
+    }
+    footer img { height: 36px; margin-bottom: 10px; filter: brightness(0) invert(1) sepia(1) saturate(3) hue-rotate(5deg); opacity: 0.7; }
+    footer .tagline { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--gold); letter-spacing: 2px; margin-bottom: 8px; }
+    footer .foot-meta { font-size: 11px; color: var(--slate); }
+    footer #lastSaved { color: var(--gold); margin-left: 12px; }
+
+    /* ─────────────────────────────────────────
+       STATUS SELECT IN TABLE
+    ───────────────────────────────────────── */
+    .status-select {
+      border: none; background: transparent; font-size: 10px; font-weight: 700;
+      cursor: pointer; text-transform: uppercase; letter-spacing: 0.8px;
+      padding: 4px 8px; border-radius: 2px; outline: none;
+      appearance: none; -webkit-appearance: none;
+    }
+
+    /* ─────────────────────────────────────────
+       DIVIDER
+    ───────────────────────────────────────── */
+    .gold-divider { width: 60px; height: 1px; background: var(--gold); margin: 0 auto 20px; }
+
+    /* ─────────────────────────────────────────
+       INVESTOR TRACKER
+    ───────────────────────────────────────── */
+    .investor-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 4px; padding: 16px 18px;
+      box-shadow: 0 1px 4px var(--shadow);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .inv-name { font-weight: 700; font-size: 15px; color: var(--charcoal); }
+    .inv-detail { font-size: 12px; color: var(--slate); }
+    .inv-detail strong { color: var(--charcoal); }
+    .inv-status { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 9px; border-radius: 2px; align-self: flex-start; }
+    .inv-active  { background: #E8F5EE; color: var(--green); }
+    .inv-passive { background: var(--cream-dark); color: var(--slate); }
+    .inv-warm    { background: var(--gold-pale); color: var(--gold); }
+
+    /* ─────────────────────────────────────────
+       INVESTOR ADD FORM
+    ───────────────────────────────────────── */
+    .inv-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 900px) { .inv-grid { grid-template-columns: 1fr 1fr; } }
+
+    /* ─────────────────────────────────────────
+       SUMMARY NUMBERS (hero)
+    ───────────────────────────────────────── */
+    .hero-stat { text-align: center; padding: 24px 12px; }
+    .hero-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 56px; font-weight: 700; color: var(--charcoal); line-height: 1;
+    }
+    .hero-num.gold { color: var(--gold); }
+    .hero-num.green { color: var(--green); }
+    .hero-label { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--slate-light); margin-top: 8px; }
+
+    /* ─────────────────────────────────────────
+       DIVIDER ROW
+    ───────────────────────────────────────── */
+    .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+    /* ─────────────────────────────────────────
+       MOBILE
+    ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      header { padding: 0 20px; min-height: 64px; }
+      .header-center { display: none; }
+      .page { padding: 20px; }
+      .nav-tabs { padding: 0 20px; overflow-x: auto; }
+      .grid-6 { grid-template-columns: repeat(2,1fr); }
+    }
   </style>
 </head>
 <body>
 
+<div class="topbar"></div>
+
+<!-- ─────────────────────────────────────────
+     HEADER
+───────────────────────────────────────── -->
 <header>
-  <div class="header-left">
-    <div class="logo-box">SPG</div>
-    <div>
-      <div class="company-name">Strath Property Group Ltd</div>
-      <div class="company-sub">Operations Dashboard</div>
+  <div class="header-logo">
+    <img src="logo-banner.png" alt="Strath Property Group" onerror="this.style.display='none';document.querySelector('.header-logo-text').style.display='block'"/>
+    <div class="header-logo-text" style="display:none">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--white);letter-spacing:3px">STRATH</div>
+      <div style="font-size:10px;color:var(--gold);letter-spacing:2px;text-transform:uppercase">Property Group</div>
     </div>
   </div>
-  <div class="header-right" style="text-align:right;">
-    <div>Current Phase: <strong>Active Operations — Deal Sourcing</strong> &nbsp;|&nbsp; Target: <strong>First Deal Closed Nov 2026</strong></div>
-    <div style="color:var(--gold);font-size:12px;margin-top:3px;" id="currentDate"></div>
+  <div class="header-center">
+    <div class="dash-title">Operations Dashboard</div>
+  </div>
+  <div class="header-right">
+    <div class="phase">Phase: <strong>Active Operations — Deal Sourcing</strong></div>
+    <div class="header-date" id="currentDate"></div>
   </div>
 </header>
 
+<!-- ─────────────────────────────────────────
+     NAVIGATION
+───────────────────────────────────────── -->
+<nav class="nav-tabs">
+  <div class="nav-tab active" onclick="switchTab('overview')">Overview</div>
+  <div class="nav-tab" onclick="switchTab('pipeline')">Deal Pipeline</div>
+  <div class="nav-tab" onclick="switchTab('market')">Market Intelligence</div>
+  <div class="nav-tab" onclick="switchTab('analysis')">Deal Analysis</div>
+  <div class="nav-tab" onclick="switchTab('investors')">Investors</div>
+  <div class="nav-tab" onclick="switchTab('roadmap')">Roadmap</div>
+  <div class="nav-tab" onclick="switchTab('operations')">Operations</div>
+</nav>
+
 <div class="page">
 
-  <div class="edit-hint">✏️ Click any number to edit it — all totals update automatically and your data is saved in this browser.</div>
+<!-- ═══════════════════════════════════════════
+     TAB 1 — OVERVIEW
+═══════════════════════════════════════════ -->
+<div class="tab-section active" id="tab-overview">
 
-  <!-- ── KPI Cards ── -->
-  <div class="section-title">Weekly KPI Scorecard</div>
-  <div class="kpi-grid" id="kpiGrid">
-    <!-- rendered by JS -->
+  <div class="edit-hint">
+    <span>✦</span> Click any underlined number to edit it — all figures update automatically and are saved in your browser.
   </div>
 
-  <!-- ── Monthly + Roadmap ── -->
-  <div class="two-col">
+  <!-- Hero summary numbers -->
+  <div class="card" style="margin-bottom:24px; padding: 8px 0;">
+    <div style="display:grid; grid-template-columns: repeat(5,1fr); border-right: none;">
+      <div class="hero-stat" style="border-right:1px solid var(--border)">
+        <div class="hero-num gold" id="ov-deals">5</div>
+        <div class="hero-label">Deals in Pipeline</div>
+      </div>
+      <div class="hero-stat" style="border-right:1px solid var(--border)">
+        <div class="hero-num" id="ov-investors">0</div>
+        <div class="hero-label">Investors Profiled</div>
+      </div>
+      <div class="hero-stat" style="border-right:1px solid var(--border)">
+        <div class="hero-num green" id="ov-packaged">0</div>
+        <div class="hero-label">Deals Packaged</div>
+      </div>
+      <div class="hero-stat" style="border-right:1px solid var(--border)">
+        <div class="hero-num" id="ov-assessed">5</div>
+        <div class="hero-label">Properties Assessed</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-num gold">£3k</div>
+        <div class="hero-label">Target Fee / Deal</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="sub-label">Weekly KPI Scorecard</div>
+  <div class="grid-6" id="kpiGrid"></div>
+
+  <!-- Monthly Progress + Roadmap summary -->
+  <div class="grid-2">
     <div class="card">
-      <div class="card-title"><div class="icon">📊</div> Monthly Progress vs Targets</div>
+      <div class="card-title">Monthly Progress</div>
       <div id="monthlyBars"></div>
     </div>
-
     <div class="card">
-      <div class="card-title"><div class="icon">📍</div> Roadmap to First Deal</div>
-      <div class="roadmap">
-        <div class="road-item">
-          <div class="road-dot-col"><div class="road-dot active"></div><div class="road-line"></div></div>
-          <div class="road-content">
-            <div class="road-month">June 2026 — NOW</div>
-            <div class="road-title active-title">Setup Complete &amp; Active Operations</div>
-            <div class="road-desc">All backend systems live. Daily deal search begins. Investor outreach starts.</div>
-            <div class="road-milestone">
-              <span class="milestone-tag done">Systems live</span>
-              <span class="milestone-tag">5 properties assessed</span>
-              <span class="milestone-tag">First outreach sent</span>
-            </div>
-          </div>
-        </div>
-        <div class="road-item">
-          <div class="road-dot-col"><div class="road-dot future"></div><div class="road-line"></div></div>
-          <div class="road-content">
-            <div class="road-month">July 2026</div>
-            <div class="road-title">Investor Pipeline Build</div>
-            <div class="road-desc">10–15 investors fully profiled. 8 deals packaged. 3+ agent relationships.</div>
-            <div class="road-milestone"><span class="milestone-tag">10 investors profiled</span><span class="milestone-tag">8 deals packaged</span><span class="milestone-tag">First deal distributed</span></div>
-          </div>
-        </div>
-        <div class="road-item">
-          <div class="road-dot-col"><div class="road-dot future"></div><div class="road-line"></div></div>
-          <div class="road-content">
-            <div class="road-month">August 2026</div>
-            <div class="road-title">Deal Flow Established</div>
-            <div class="road-desc">25 deals packaged. Active investor meetings. 15+ investors on active list.</div>
-          </div>
-        </div>
-        <div class="road-item">
-          <div class="road-dot-col"><div class="road-dot future"></div><div class="road-line"></div></div>
-          <div class="road-content">
-            <div class="road-month">September 2026</div>
-            <div class="road-title">Deal Conversion</div>
-            <div class="road-desc">40 deals packaged. First offers being considered.</div>
-          </div>
-        </div>
-        <div class="road-item">
-          <div class="road-dot-col"><div class="road-dot future"></div><div class="road-line"></div></div>
-          <div class="road-content">
-            <div class="road-month">October 2026</div>
-            <div class="road-title">Pre-Close</div>
-            <div class="road-desc">50 deals packaged. At least one deal under offer.</div>
-          </div>
-        </div>
-        <div class="road-item">
-          <div class="road-dot-col"><div class="road-dot future"></div></div>
-          <div class="road-content">
-            <div class="road-month">November 2026</div>
-            <div class="road-title goal-title">🏆 FIRST DEAL CLOSED</div>
-            <div class="road-desc">First sourcing fee received: <strong>£2,000 – £4,000</strong>. Company formally registered.</div>
-          </div>
-        </div>
+      <div class="card-title">Business at a Glance</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+        <div class="crit-row"><span class="crit-key">Target First Deal</span><span class="crit-val g">November 2026</span></div>
+        <div class="crit-row"><span class="crit-key">Sourcing Fee</span><span class="crit-val g">£2,000 – £4,000</span></div>
+        <div class="crit-row"><span class="crit-key">Focus Area</span><span class="crit-val">Glasgow &amp; West</span></div>
+        <div class="crit-row"><span class="crit-key">Min BTL Yield</span><span class="crit-val g">7%+</span></div>
+        <div class="crit-row"><span class="crit-key">Min BMV Discount</span><span class="crit-val g">15%+</span></div>
+        <div class="crit-row"><span class="crit-key">Flip Min Profit</span><span class="crit-val g">£15,000+</span></div>
+        <div class="crit-row"><span class="crit-key">Max Purchase Price</span><span class="crit-val">£200,000</span></div>
+        <div class="crit-row"><span class="crit-key">Weekly Deal Target</span><span class="crit-val">10+ assessed</span></div>
+      </div>
+      <div class="sub-label" style="margin-top:16px;">Pipeline Stage Flow</div>
+      <div class="stage-flow">
+        <span class="stage-chip">Spotted</span><span class="stage-arrow">›</span>
+        <span class="stage-chip">Assessing</span><span class="stage-arrow">›</span>
+        <span class="stage-chip">Packaging</span><span class="stage-arrow">›</span>
+        <span class="stage-chip">Distributed</span><span class="stage-arrow">›</span>
+        <span class="stage-chip">Offer Stage</span><span class="stage-arrow">›</span>
+        <span class="stage-chip" style="background:var(--charcoal);color:var(--gold)">Closed ✓</span>
       </div>
     </div>
   </div>
 
-  <!-- ── Deal Pipeline ── -->
-  <div class="section-title">Deal Pipeline</div>
-  <div class="card" style="margin-bottom:28px; padding:16px 20px;">
-    <button class="add-deal-btn" onclick="toggleAddDeal()">+ Add Deal</button>
-    <div class="add-deal-form" id="addDealForm">
-      <div class="form-field"><label>Deal ID</label><input id="nd-id" placeholder="e.g. G21-001" /></div>
-      <div class="form-field"><label>Location</label><input id="nd-loc" placeholder="Area, Glasgow G21" /></div>
-      <div class="form-field"><label>Strategy</label>
-        <select id="nd-strat"><option>BTL</option><option>BRRR</option><option>Flip</option></select>
-      </div>
-      <div class="form-field"><label>Purchase Price (£)</label><input id="nd-price" type="number" placeholder="150000" /></div>
-      <div class="form-field"><label>Monthly Rent (£)</label><input id="nd-rent" type="number" placeholder="900" /></div>
-      <div class="form-field"><label>Status</label>
-        <select id="nd-status"><option>Sourcing</option><option>Assessing</option><option>Packaged</option><option>Distributed</option><option>Offer Stage</option><option>Closed</option></select>
-      </div>
-      <button class="form-submit" onclick="addDeal()">Add Deal</button>
+  <!-- Charts -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Yield by Deal — Current Pipeline</div>
+      <div class="chart-wrap"><canvas id="yieldChartOv"></canvas></div>
+      <div style="font-size:11px;color:var(--slate-light);text-align:center;margin-top:10px">Dashed line = 7% minimum target</div>
     </div>
+    <div class="card">
+      <div class="card-title">Glasgow Market Yields by Area</div>
+      <div class="chart-wrap"><canvas id="marketChartOv"></canvas></div>
+      <div style="font-size:11px;color:var(--slate-light);text-align:center;margin-top:10px">Verified market data — May 2026</div>
+    </div>
+  </div>
+
+</div><!-- /overview -->
+
+
+<!-- ═══════════════════════════════════════════
+     TAB 2 — DEAL PIPELINE
+═══════════════════════════════════════════ -->
+<div class="tab-section" id="tab-pipeline">
+
+  <div class="section-header">
+    <h2>Deal Pipeline</h2>
+    <span class="sub">Active properties under assessment</span>
+  </div>
+
+  <div class="edit-hint"><span>✦</span> Click any underlined value to edit it. Use the status dropdown to progress a deal. Add new deals with the button below.</div>
+
+  <button class="add-btn" onclick="toggleDealForm()">+ Add New Deal</button>
+  <div class="deal-form" id="dealForm">
+    <div class="ff"><label>Deal ID</label><input id="nd-id" placeholder="G21-001"/></div>
+    <div class="ff"><label>Location</label><input id="nd-loc" placeholder="Shettleston, Glasgow G33"/></div>
+    <div class="ff"><label>Postcode</label><input id="nd-pc" placeholder="G33"/></div>
+    <div class="ff"><label>Strategy</label><select id="nd-strat"><option>BTL</option><option>BRRR</option><option>Flip</option><option>HMO</option></select></div>
+    <div class="ff"><label>Purchase Price (£)</label><input id="nd-price" type="number" placeholder="150000"/></div>
+    <div class="ff"><label>Monthly Rent (£)</label><input id="nd-rent" type="number" placeholder="900"/></div>
+    <div class="ff"><label>Status</label><select id="nd-status"><option>Sourcing</option><option>Assessing</option><option>Packaged</option><option>Distributed</option><option>Offer Stage</option><option>Closed</option></select></div>
+    <div class="ff"><label>Notes</label><input id="nd-notes" placeholder="Brief notes..."/></div>
+    <button class="ff-submit" onclick="addDeal()">Add to Pipeline</button>
+  </div>
+
+  <div class="card" style="padding: 0; overflow: hidden;">
     <div style="overflow-x:auto;">
-      <table class="pipeline-table">
+      <table class="data-table">
         <thead>
           <tr>
-            <th style="padding-left:8px">Deal ID</th>
+            <th style="padding-left:24px">Deal ID</th>
             <th>Location</th>
             <th>Strategy</th>
             <th>Purchase Price</th>
@@ -357,464 +779,1095 @@
             <th></th>
           </tr>
         </thead>
-        <tbody id="pipelineBody"></tbody>
+        <tbody id="pipelineBody" style="font-size:13px;"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- ── Charts + Analysis ── -->
-  <div class="three-col">
+  <div class="divider"></div>
+
+  <!-- Pipeline summary stats -->
+  <div class="grid-3">
     <div class="card">
-      <div class="card-title"><div class="icon">📈</div> Gross Yield by Deal</div>
-      <div class="chart-wrap"><canvas id="yieldChart"></canvas></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">Target minimum: <strong>7% gross yield</strong> for BTL deals</div>
+      <div class="card-title">Yield Distribution</div>
+      <div class="chart-wrap-sm"><canvas id="yieldChartPipe"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Stage Breakdown</div>
+      <div id="stageBreakdown" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Pipeline Summary</div>
+      <div id="pipeSummary" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+  </div>
+
+</div><!-- /pipeline -->
+
+
+<!-- ═══════════════════════════════════════════
+     TAB 3 — MARKET INTELLIGENCE
+═══════════════════════════════════════════ -->
+<div class="tab-section" id="tab-market">
+
+  <div class="section-header">
+    <h2>Glasgow Market Intelligence</h2>
+    <span class="sub">Verified data — May 2026 · Sources: Rightmove, Zoopla, ESPC, OnTheMarket</span>
+  </div>
+
+  <!-- Tier 1 -->
+  <div class="sub-label">Tier 1 — High Yield, Priority Sourcing</div>
+  <div class="grid-3" style="margin-bottom:28px;">
+
+    <div class="area-card">
+      <span class="tier-badge tier-1">Tier 1 — Priority ⭐</span>
+      <div class="area-name">Shettleston</div>
+      <div class="area-postcode">G33 · East Glasgow</div>
+      <div class="area-yield">8.5% – 14.3%</div>
+      <div class="area-stat">1-bed entry: <strong>£60,000 – £100,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£708/mo</strong></div>
+      <div class="area-stat">2-bed rent: <strong>£740 – £810/mo</strong></div>
+      <div class="area-stat" style="margin-top:8px;font-size:11px;color:var(--slate-light)">8–12 active listings at any time · Target 2–3 deals/month</div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><div class="icon">🔢</div> Deal Analysis — Base Case</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Edit any input below — all outputs recalculate instantly</div>
-      <div id="modelRows"></div>
+    <div class="area-card">
+      <span class="tier-badge tier-1">Tier 1 — Priority</span>
+      <div class="area-name">Mount Florida</div>
+      <div class="area-postcode">G43 · South Glasgow</div>
+      <div class="area-yield">12.1%</div>
+      <div class="area-stat">1-bed entry: <strong>£775,000 – £939,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£775/mo</strong></div>
+      <div class="area-stat">2-bed rent: <strong>£939 – £1,450/mo</strong></div>
+      <div class="area-stat" style="margin-top:8px;font-size:11px;color:var(--slate-light)">3–5 active listings · Target 1 deal/month</div>
     </div>
 
+    <div class="area-card">
+      <span class="tier-badge tier-1">Tier 1 — Priority</span>
+      <div class="area-name">East End</div>
+      <div class="area-postcode">G32 · East Glasgow</div>
+      <div class="area-yield">8.2% – 9.8%</div>
+      <div class="area-stat">1-bed entry: <strong>£87,000 – £100,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£710/mo</strong></div>
+      <div class="area-stat">Avg sold: <strong>£135,072</strong></div>
+      <div class="area-stat" style="margin-top:8px;font-size:11px;color:var(--slate-light)">6–10 active listings · Target 2–3 deals/month</div>
+    </div>
+
+  </div>
+
+  <!-- Tier 2 -->
+  <div class="sub-label">Tier 2 — Balanced Portfolio</div>
+  <div class="grid-3" style="margin-bottom:28px;">
+
+    <div class="area-card">
+      <span class="tier-badge tier-2">Tier 2</span>
+      <div class="area-name">City Centre</div>
+      <div class="area-postcode">G1 / G2 · Central Glasgow</div>
+      <div class="area-yield mid">6.4% – 8.0%</div>
+      <div class="area-stat">1-bed entry: <strong>£155,000 – £186,700</strong></div>
+      <div class="area-stat">2-bed entry: <strong>£205,000 – £305,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£997/mo</strong> · 2-bed: <strong>£1,265 – £2,100/mo</strong></div>
+    </div>
+
+    <div class="area-card">
+      <span class="tier-badge tier-2">Tier 2</span>
+      <div class="area-name">Gorbals</div>
+      <div class="area-postcode">G5 · South Glasgow</div>
+      <div class="area-yield mid">6.8% – 10.5%</div>
+      <div class="area-stat">1-bed entry: <strong>£100,000 – £155,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£1,052/mo</strong></div>
+      <div class="area-stat">Avg sold: <strong>£195,241</strong></div>
+    </div>
+
+    <div class="area-card">
+      <span class="tier-badge tier-2">Tier 2</span>
+      <div class="area-name">Ibrox</div>
+      <div class="area-postcode">G51 · West Glasgow</div>
+      <div class="area-yield mid">6.9% – 9.2%</div>
+      <div class="area-stat">1-bed entry: <strong>£75,000 – £100,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£575/mo</strong> (incl. bills)</div>
+    </div>
+
+  </div>
+
+  <!-- Tier 3 -->
+  <div class="sub-label">Tier 3 — Secondary / Portfolio Balance</div>
+  <div class="grid-3" style="margin-bottom:28px;">
+
+    <div class="area-card">
+      <span class="tier-badge tier-3">Tier 3</span>
+      <div class="area-name">Dennistoun</div>
+      <div class="area-postcode">G31 · East Glasgow</div>
+      <div class="area-yield low">5.1%</div>
+      <div class="area-stat">1-bed entry: <strong>£180,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£767/mo</strong> · 2-bed: <strong>£920 – £1,300/mo</strong></div>
+      <div class="area-stat">Avg sold: <strong>£167,134</strong></div>
+    </div>
+
+    <div class="area-card">
+      <span class="tier-badge tier-3">Tier 3</span>
+      <div class="area-name">Govanhill</div>
+      <div class="area-postcode">G41 · South Glasgow</div>
+      <div class="area-yield low">5.6% – 6.1%</div>
+      <div class="area-stat">1-bed entry: <strong>£143,000 – £155,000</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£725/mo</strong> · 2-bed: <strong>£1,333 – £1,380/mo</strong></div>
+      <div class="area-stat">2-bed avg sold: <strong>£181,479</strong></div>
+    </div>
+
+    <div class="area-card">
+      <span class="tier-badge tier-3">Tier 3</span>
+      <div class="area-name">Govan</div>
+      <div class="area-postcode">G42 · West Glasgow</div>
+      <div class="area-yield low">3.9%</div>
+      <div class="area-stat">1-bed avg sold: <strong>£197,910</strong></div>
+      <div class="area-stat">1-bed rent: <strong>£650/mo</strong></div>
+      <div class="area-stat">2-bed avg sold: <strong>£150,000</strong></div>
+    </div>
+
+  </div>
+
+  <!-- Market chart -->
+  <div class="card">
+    <div class="card-title">Yield Comparison — All 9 Glasgow Postcodes</div>
+    <div style="height:260px;position:relative;"><canvas id="allYieldChart"></canvas></div>
+  </div>
+
+</div><!-- /market -->
+
+
+<!-- ═══════════════════════════════════════════
+     TAB 4 — DEAL ANALYSIS MODEL
+═══════════════════════════════════════════ -->
+<div class="tab-section" id="tab-analysis">
+
+  <div class="section-header">
+    <h2>Deal Analysis Framework</h2>
+    <span class="sub">Edit any input — outputs recalculate in real time</span>
+  </div>
+
+  <div class="grid-2">
+    <!-- Inputs -->
     <div class="card">
-      <div class="card-title"><div class="icon">⚡</div> Rate Stress Test</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Monthly cashflow at £150k purchase, 75% LTV, £2,000 rent</div>
+      <div class="card-title">Property Inputs</div>
+      <div class="sub-label">Purchase &amp; Financing</div>
+      <div id="modelInputs"></div>
+    </div>
+
+    <!-- Outputs -->
+    <div class="card">
+      <div class="card-title">Performance Outputs</div>
+      <div id="modelOutputs"></div>
+      <div class="divider"></div>
+      <div class="card-title">Stress Test — Rate Sensitivity</div>
+      <div style="font-size:12px;color:var(--slate-light);margin-bottom:12px;">Monthly cashflow at different mortgage rates (£150k, 75% LTV, inputs from model)</div>
       <div class="chart-wrap"><canvas id="rateChart"></canvas></div>
     </div>
   </div>
 
-  <!-- ── Responsibilities + Criteria ── -->
-  <div class="two-col">
+  <div class="card" style="margin-top:0;">
+    <div class="card-title">Stress Matrix — Monthly Cashflow (£)</div>
+    <div style="font-size:12px;color:var(--slate-light);margin-bottom:16px;">Rows = mortgage rate · Columns = rent variance. <span style="color:var(--green);font-weight:600">Green = £100+/mo</span> · <span style="color:var(--amber);font-weight:600">Amber = £0–£100</span> · <span style="color:var(--red);font-weight:600">Red = negative</span></div>
+    <div style="overflow-x:auto;"><div id="stressMatrix"></div></div>
+  </div>
+
+</div><!-- /analysis -->
+
+
+<!-- ═══════════════════════════════════════════
+     TAB 5 — INVESTORS
+═══════════════════════════════════════════ -->
+<div class="tab-section" id="tab-investors">
+
+  <div class="section-header">
+    <h2>Investor Database</h2>
+    <span class="sub">Track and manage all investor relationships</span>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:24px;">
+    <div class="stat-card green">
+      <div class="stat-label">Active Investors</div>
+      <div class="stat-value" id="inv-active-count">0</div>
+      <div class="stat-meta">Target: <strong>15 by end August</strong></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Fully Profiled</div>
+      <div class="stat-value" id="inv-profiled-count">0</div>
+      <div class="stat-meta">Target: <strong>10 by end July</strong></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Passive / Nurturing</div>
+      <div class="stat-value" id="inv-passive-count">0</div>
+      <div class="stat-meta">WhatsApp broadcast list</div>
+    </div>
+  </div>
+
+  <button class="add-btn" onclick="toggleInvForm()">+ Add Investor</button>
+  <div class="deal-form" id="invForm" style="grid-template-columns: repeat(auto-fit,minmax(160px,1fr));">
+    <div class="ff"><label>Full Name</label><input id="inv-name" placeholder="Name"/></div>
+    <div class="ff"><label>Strategy</label><select id="inv-strat"><option>BTL</option><option>Flip</option><option>BRRR</option><option>All</option></select></div>
+    <div class="ff"><label>Max Budget (£)</label><input id="inv-budget" type="number" placeholder="200000"/></div>
+    <div class="ff"><label>Min Yield / Profit</label><input id="inv-yield" placeholder="7% / £15k"/></div>
+    <div class="ff"><label>Funding</label><select id="inv-fund"><option>Cash</option><option>Mortgage</option><option>Both</option></select></div>
+    <div class="ff"><label>Status</label><select id="inv-status"><option>Active</option><option>Warm</option><option>Passive</option></select></div>
+    <div class="ff"><label>Notes</label><input id="inv-notes" placeholder="Key details..."/></div>
+    <button class="ff-submit" onclick="addInvestor()">Add Investor</button>
+  </div>
+
+  <div class="inv-grid" id="investorGrid">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--slate-light);font-size:14px;font-style:italic;">No investors added yet. Use the button above to add your first investor.</div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="card">
+    <div class="card-title">Investor Qualification Criteria</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="crit-row"><span class="crit-key">Minimum Capital Ready</span><span class="crit-val">~£30,000+</span></div>
+      <div class="crit-row"><span class="crit-key">Location Openness</span><span class="crit-val">Scotland / Glasgow</span></div>
+      <div class="crit-row"><span class="crit-key">Clear Strategy</span><span class="crit-val">BTL / Flip / BRRR</span></div>
+      <div class="crit-row"><span class="crit-key">Active Buyer</span><span class="crit-val">Actively looking</span></div>
+      <div class="crit-row"><span class="crit-key">Onboarding Call</span><span class="crit-val">30-min qualification</span></div>
+      <div class="crit-row"><span class="crit-key">Response Time</span><span class="crit-val">&lt; 4 hours (business hours)</span></div>
+    </div>
+  </div>
+
+</div><!-- /investors -->
+
+
+<!-- ═══════════════════════════════════════════
+     TAB 6 — ROADMAP
+═══════════════════════════════════════════ -->
+<div class="tab-section" id="tab-roadmap">
+
+  <div class="section-header">
+    <h2>Roadmap to First Deal</h2>
+    <span class="sub">June 2026 → November 2026 · Target: first sourcing fee received</span>
+  </div>
+
+  <div class="grid-2">
     <div class="card">
-      <div class="card-title"><div class="icon">👥</div> Responsibilities — Joe &amp; Ciaran</div>
-      <table class="resp-table">
-        <thead><tr><th>Function</th><th>Owner</th></tr></thead>
+      <div class="card-title">Month-by-Month Milestones</div>
+      <div class="roadmap">
+
+        <div class="road-item">
+          <div class="road-dot active"></div>
+          <div class="road-month">June 2026 — Now</div>
+          <div class="road-title active">Setup Complete &amp; Active Operations</div>
+          <div class="road-desc">All backend systems live. Daily Rightmove/Zoopla deal search begins. Investor outreach starts immediately on LinkedIn, Facebook, Instagram. Estate agent relationship building underway.</div>
+          <div class="road-tags">
+            <span class="road-tag done">Systems live</span>
+            <span class="road-tag">5 properties assessed</span>
+            <span class="road-tag">First investor outreach</span>
+            <span class="road-tag">First onboarding call</span>
+          </div>
+        </div>
+
+        <div class="road-item">
+          <div class="road-dot"></div>
+          <div class="road-month">July 2026</div>
+          <div class="road-title">Investor Pipeline Build</div>
+          <div class="road-desc">Complete 6–8 onboarding calls. Achieve 10–15 investors fully profiled in database. Analyse and package minimum 8 deals. Develop relationships with 3–4 estate agents in target postcodes. Run first WhatsApp broadcast deal distribution.</div>
+          <div class="road-tags">
+            <span class="road-tag">10 investors profiled</span>
+            <span class="road-tag">8 deals packaged</span>
+            <span class="road-tag">3+ agent relationships</span>
+            <span class="road-tag">First deal distributed</span>
+          </div>
+        </div>
+
+        <div class="road-item">
+          <div class="road-dot"></div>
+          <div class="road-month">August 2026</div>
+          <div class="road-title">Deal Flow Established</div>
+          <div class="road-desc">25 deals packaged. Active investor meetings taking place. 15+ investors on active list. Consistent deal flow from 3+ agent sources. Social media content generating inbound enquiries.</div>
+          <div class="road-tags">
+            <span class="road-tag">25 deals packaged</span>
+            <span class="road-tag">15 active investors</span>
+          </div>
+        </div>
+
+        <div class="road-item">
+          <div class="road-dot"></div>
+          <div class="road-month">September 2026</div>
+          <div class="road-title">Deal Conversion Phase</div>
+          <div class="road-desc">40 deals packaged total. First offers being considered by investors. Support with due diligence, solicitor introductions, and negotiation.</div>
+          <div class="road-tags">
+            <span class="road-tag">40 deals packaged</span>
+            <span class="road-tag">First offers</span>
+          </div>
+        </div>
+
+        <div class="road-item">
+          <div class="road-dot"></div>
+          <div class="road-month">October 2026</div>
+          <div class="road-title">Pre-Close</div>
+          <div class="road-desc">50 deals packaged. At least one deal under offer. Solicitors instructed. Begin company registration process.</div>
+          <div class="road-tags">
+            <span class="road-tag">50 deals packaged</span>
+            <span class="road-tag">Deal under offer</span>
+          </div>
+        </div>
+
+        <div class="road-item">
+          <div class="road-dot"></div>
+          <div class="road-month">November 2026</div>
+          <div class="road-title goal">🏆 First Deal Closed</div>
+          <div class="road-desc">First sourcing fee received. Company formally registered. Fee range <strong>£2,000 – £4,000</strong> (flat fee or 2% of purchase price). All revenue paid into business account.</div>
+          <div class="road-tags">
+            <span class="road-tag" style="background:var(--gold-pale);color:var(--gold)">Fee: £2,000–£4,000</span>
+            <span class="road-tag" style="background:#E8F5EE;color:var(--green)">Company registered</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="card">
+        <div class="card-title">KPI Targets by Month</div>
+        <table class="data-table">
+          <thead><tr><th>KPI</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th></tr></thead>
+          <tbody>
+            <tr><td>Deals Packaged (cumulative)</td><td>—</td><td>8</td><td>25</td><td>40</td><td>50</td><td style="color:var(--green);font-weight:700">CLOSED</td></tr>
+            <tr><td>Investors Profiled</td><td>3</td><td>10</td><td>15+</td><td>20+</td><td>20+</td><td>—</td></tr>
+            <tr><td>Agent Relationships</td><td>1</td><td>3–4</td><td>5+</td><td>5+</td><td>5+</td><td>—</td></tr>
+            <tr><td>Offers Made</td><td>—</td><td>—</td><td>—</td><td>1+</td><td>1 under offer</td><td style="color:var(--green);font-weight:700">Exchange</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Sourcing Strategy Priorities</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="crit-row" style="border-left-color:var(--charcoal);">
+            <div>
+              <div style="font-weight:700;font-size:13px;margin-bottom:2px;">Week 1: Agent Relationships (G33)</div>
+              <div style="font-size:12px;color:var(--slate)">Contact top 5 independent agents in Shettleston. Goal: 3 relationships.</div>
+            </div>
+          </div>
+          <div class="crit-row" style="border-left-color:var(--charcoal);">
+            <div>
+              <div style="font-weight:700;font-size:13px;margin-bottom:2px;">Week 1–2: Off-Market Pipeline</div>
+              <div style="font-size:12px;color:var(--slate)">Build list of refurb contractors in G33, G43, G32 for off-market inventory.</div>
+            </div>
+          </div>
+          <div class="crit-row" style="border-left-color:var(--charcoal);">
+            <div>
+              <div style="font-weight:700;font-size:13px;margin-bottom:2px;">Week 2: Portfolio Managers</div>
+              <div style="font-size:12px;color:var(--slate)">2–3 relationships in East Glasgow (G31, G32, G33) for institutional deals.</div>
+            </div>
+          </div>
+          <div class="crit-row" style="border-left-color:var(--charcoal);">
+            <div>
+              <div style="font-weight:700;font-size:13px;margin-bottom:2px;">Week 2–3: Active Portal Searches</div>
+              <div style="font-size:12px;color:var(--slate)">Rightmove, Zoopla, OnTheMarket — all Tier 1 postcodes. Daily monitoring.</div>
+            </div>
+          </div>
+          <div class="crit-row" style="border-left-color:var(--gold);">
+            <div>
+              <div style="font-weight:700;font-size:13px;margin-bottom:2px;">Week 3: Offer Pipeline Launch</div>
+              <div style="font-size:12px;color:var(--slate)">3–5 pre-identified target properties. Begin negotiations.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /roadmap -->
+
+
+<!-- ═══════════════════════════════════════════
+     TAB 7 — OPERATIONS
+═══════════════════════════════════════════ -->
+<div class="tab-section" id="tab-operations">
+
+  <div class="section-header">
+    <h2>Operations &amp; Responsibilities</h2>
+    <span class="sub">Internal operating structure — Joe &amp; Ciaran</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Responsibility Matrix</div>
+      <table class="data-table">
+        <thead><tr><th>Function</th><th>Owner</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td>Investor relationships &amp; communication</td><td><span class="owner-tag owner-both">Both</span></td></tr>
-          <tr><td>Social media &amp; content creation</td><td><span class="owner-tag owner-joe">Joe</span></td></tr>
-          <tr><td>AI modelling tools &amp; build</td><td><span class="owner-tag owner-joe">Joe</span></td></tr>
-          <tr><td>Full financial analysis (deal framework)</td><td><span class="owner-tag owner-ciaran">Ciaran</span></td></tr>
-          <tr><td>Deal packaging (PDF deal packs)</td><td><span class="owner-tag owner-ciaran">Ciaran</span></td></tr>
-          <tr><td>Backend systems &amp; dashboards</td><td><span class="owner-tag owner-ciaran">Ciaran</span></td></tr>
-          <tr><td>Property search (daily)</td><td><span class="owner-tag owner-both">Both</span></td></tr>
-          <tr><td>Estate agent &amp; broker relationships</td><td><span class="owner-tag owner-both">Both</span></td></tr>
-          <tr><td>WhatsApp broadcast management</td><td><span class="owner-tag owner-joe">Joe</span></td></tr>
-          <tr><td>Weekly review (every Friday)</td><td><span class="owner-tag owner-both">Both</span></td></tr>
+          <tr><td style="font-weight:600">Investor relationships</td><td><span class="owner own-both">Both</span></td><td style="font-size:12px;color:var(--slate)">All investor-facing comms, calls, deal delivery</td></tr>
+          <tr><td style="font-weight:600">Social media &amp; content</td><td><span class="owner own-joe">Joe</span></td><td style="font-size:12px;color:var(--slate)">Instagram, TikTok, LinkedIn creation and posting</td></tr>
+          <tr><td style="font-weight:600">AI modelling tools</td><td><span class="owner own-joe">Joe</span></td><td style="font-size:12px;color:var(--slate)">Build, maintain and improve AI-integrated models</td></tr>
+          <tr><td style="font-weight:600">Financial analysis</td><td><span class="owner own-ciaran">Ciaran</span></td><td style="font-size:12px;color:var(--slate)">All deal analysis using the Deal Analysis Framework</td></tr>
+          <tr><td style="font-weight:600">Deal packaging</td><td><span class="owner own-ciaran">Ciaran</span></td><td style="font-size:12px;color:var(--slate)">Build and format all deal packs in PDF format</td></tr>
+          <tr><td style="font-weight:600">Backend systems</td><td><span class="owner own-ciaran">Ciaran</span></td><td style="font-size:12px;color:var(--slate)">Spreadsheets, trackers, dashboards, CRM, filing</td></tr>
+          <tr><td style="font-weight:600">Property search (daily)</td><td><span class="owner own-both">Both</span></td><td style="font-size:12px;color:var(--slate)">Both search platforms daily and flag potential deals</td></tr>
+          <tr><td style="font-weight:600">Agent relationships</td><td><span class="owner own-both">Both</span></td><td style="font-size:12px;color:var(--slate)">Build estate agent and mortgage broker relationships</td></tr>
+          <tr><td style="font-weight:600">WhatsApp broadcast</td><td><span class="owner own-joe">Joe</span></td><td style="font-size:12px;color:var(--slate)">Manage investor broadcast list and deal distributions</td></tr>
+          <tr><td style="font-weight:600">Email management</td><td><span class="owner own-both">Both</span></td><td style="font-size:12px;color:var(--slate)">Own individual inbox, flag joint-decision items</td></tr>
+          <tr><td style="font-weight:600">Weekly review (Fridays)</td><td><span class="owner own-both">Both</span></td><td style="font-size:12px;color:var(--slate)">Joint 30-min review — non-negotiable</td></tr>
         </tbody>
       </table>
     </div>
 
-    <div class="card">
-      <div class="card-title"><div class="icon">🎯</div> Deal Criteria &amp; Pipeline Stages</div>
-      <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Pass Criteria</div>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px;">
-        <div class="analysis-row"><span class="akey">Location</span><span class="aval">Glasgow / West Scotland (G, PA, ML)</span></div>
-        <div class="analysis-row"><span class="akey">Max Purchase Price</span><span class="aval">£200,000</span></div>
-        <div class="analysis-row"><span class="akey">BMV Discount</span><span class="aval green">15%+ below market</span></div>
-        <div class="analysis-row"><span class="akey">BTL Gross Yield</span><span class="aval green">7%+ minimum</span></div>
-        <div class="analysis-row"><span class="akey">Flip Profit Target</span><span class="aval green">£15k+ minimum</span></div>
-        <div class="analysis-row"><span class="akey">Sourcing Fee</span><span class="aval">£2,000 – £4,000 / deal</span></div>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="card">
+        <div class="card-title">Weekly Review Agenda</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="crit-row"><span class="crit-key">1. Deals analysed this week</span><span class="crit-val">5 min</span></div>
+          <div class="crit-row"><span class="crit-key">2. Deals packaged &amp; distributed</span><span class="crit-val">5 min</span></div>
+          <div class="crit-row"><span class="crit-key">3. Investor pipeline update</span><span class="crit-val">5 min</span></div>
+          <div class="crit-row"><span class="crit-key">4. KPI check vs targets</span><span class="crit-val">5 min</span></div>
+          <div class="crit-row"><span class="crit-key">5. Blockers &amp; problems</span><span class="crit-val">5 min</span></div>
+          <div class="crit-row"><span class="crit-key">6. Priorities for next week</span><span class="crit-val">5 min</span></div>
+        </div>
       </div>
-      <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Pipeline Stages</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:12px;">
-        <span style="padding:4px 10px;background:#f0f3f8;border-radius:20px;font-weight:600">Spotted</span>
-        <span style="color:var(--muted)">→</span>
-        <span style="padding:4px 10px;background:#fff3e0;color:var(--amber);border-radius:20px;font-weight:600">Assessing</span>
-        <span style="color:var(--muted)">→</span>
-        <span style="padding:4px 10px;background:#e8f0fe;color:#1a56db;border-radius:20px;font-weight:600">Packaging</span>
-        <span style="color:var(--muted)">→</span>
-        <span style="padding:4px 10px;background:#e6f4ed;color:var(--green);border-radius:20px;font-weight:600">Distributed</span>
-        <span style="color:var(--muted)">→</span>
-        <span style="padding:4px 10px;background:#fce8ff;color:#8030b0;border-radius:20px;font-weight:600">Offer Stage</span>
-        <span style="color:var(--muted)">→</span>
-        <span style="padding:4px 10px;background:var(--navy);color:var(--gold);border-radius:20px;font-weight:600">Closed ✓</span>
+
+      <div class="card">
+        <div class="card-title">Communication Standards</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="crit-row" style="border-left-color:var(--charcoal)"><div><div style="font-weight:700;font-size:13px">Response Time</div><div style="font-size:12px;color:var(--slate)">Respond to investor messages within 4 hours during business hours</div></div></div>
+          <div class="crit-row" style="border-left-color:var(--charcoal)"><div><div style="font-weight:700;font-size:13px">Deal Delivery</div><div style="font-size:12px;color:var(--slate)">All deals sent as professionally formatted PDFs — no rough numbers</div></div></div>
+          <div class="crit-row" style="border-left-color:var(--charcoal)"><div><div style="font-weight:700;font-size:13px">Investor Channels</div><div style="font-size:12px;color:var(--slate)">Business email or agreed WhatsApp — never personal numbers</div></div></div>
+          <div class="crit-row" style="border-left-color:var(--gold)"><div><div style="font-weight:700;font-size:13px">Brand Standard</div><div style="font-size:12px;color:var(--slate)">Everything leaving SPG must reflect a professional, credible, data-driven firm</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Operational Tools</div>
+        <table class="data-table">
+          <thead><tr><th>Tool</th><th>Owner</th></tr></thead>
+          <tbody>
+            <tr><td>Deal Analysis Framework (xlsx)</td><td><span class="owner own-ciaran">Ciaran</span></td></tr>
+            <tr><td>Deal Pipeline Tracker (xlsx)</td><td><span class="owner own-ciaran">Ciaran</span></td></tr>
+            <tr><td>Investor Database</td><td><span class="owner own-both">Both</span></td></tr>
+            <tr><td>Glasgow Market Data (xlsx)</td><td><span class="owner own-ciaran">Ciaran</span></td></tr>
+            <tr><td>Deal Pack Template (PDF)</td><td><span class="owner own-ciaran">Ciaran</span></td></tr>
+            <tr><td>WhatsApp Broadcast</td><td><span class="owner own-joe">Joe</span></td></tr>
+            <tr><td>Social Media Accounts</td><td><span class="owner own-joe">Joe</span></td></tr>
+            <tr><td>Rightmove / Zoopla / OTM</td><td><span class="owner own-both">Both</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <div class="dash-footer">
-    Strath Property Group Ltd &nbsp;·&nbsp; Directors: Joe &amp; Ciaran &nbsp;·&nbsp;
-    <span id="lastSaved" style="color:var(--gold)"></span>
-  </div>
-</div>
+</div><!-- /operations -->
 
+</div><!-- /page -->
+
+<!-- ─────────────────────────────────────────
+     FOOTER
+───────────────────────────────────────── -->
+<footer>
+  <img src="logo-banner.png" alt="Strath Property Group" onerror="this.style.display='none'"/>
+  <div class="tagline">Strategic Property. Lasting Value.</div>
+  <div class="foot-meta">
+    Strath Property Group &nbsp;·&nbsp; Directors: Joe &amp; Ciaran &nbsp;·&nbsp;
+    Sourcing Scotland's Best Opportunities
+    <span id="lastSaved"></span>
+  </div>
+</footer>
+
+<!-- ─────────────────────────────────────────
+     JAVASCRIPT
+───────────────────────────────────────── -->
 <script>
-// ═══════════════════════════════════════════════
-// STATE — loaded from localStorage, saved on every edit
-// ═══════════════════════════════════════════════
+'use strict';
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
 const DEFAULTS = {
   kpis: {
-    assessed:   { label: 'Properties Assessed',  value: 5,  weeklyTarget: 10 },
-    analysed:   { label: 'Full Analysis Run',     value: 0,  weeklyTarget: 3  },
-    packaged:   { label: 'Deals Packaged',        value: 0,  weeklyTarget: 2  },
-    distributed:{ label: 'Deals Distributed',     value: 0,  weeklyTarget: 2  },
-    enquiries:  { label: 'Investor Enquiries',    value: 0,  weeklyTarget: 5  },
-    calls:      { label: 'Onboarding Calls',      value: 0,  weeklyTarget: 2  },
+    assessed:    { label:'Properties Assessed',  value:5,  target:10 },
+    analysed:    { label:'Full Analysis Run',    value:0,  target:3  },
+    packaged:    { label:'Deals Packaged',       value:0,  target:2  },
+    distributed: { label:'Deals Distributed',   value:0,  target:2  },
+    enquiries:   { label:'Investor Enquiries',  value:0,  target:5  },
+    calls:       { label:'Onboarding Calls',    value:0,  target:2  },
   },
   monthly: {
-    assessed:    { label: 'Properties Assessed',                       value: 5,  target: 40 },
-    analysed:    { label: 'Deals Passing Full Analysis',               value: 0,  target: 12 },
-    packaged:    { label: 'Deals Packaged',                            value: 0,  target: 8  },
-    distributed: { label: 'Deals Distributed',                        value: 0,  target: 8  },
-    enquiries:   { label: 'Investor Enquiries',                        value: 0,  target: 20 },
-    calls:       { label: 'Onboarding Calls',                         value: 0,  target: 8  },
-    profiled:    { label: 'Investors Fully Profiled (Jul target: 10)', value: 0,  target: 10 },
+    assessed:    { label:'Properties Assessed',                        value:5,  target:40 },
+    analysed:    { label:'Deals Passing Full Analysis',                value:0,  target:12 },
+    packaged:    { label:'Deals Packaged',                             value:0,  target:8  },
+    distributed: { label:'Deals Distributed',                         value:0,  target:8  },
+    enquiries:   { label:'Investor Enquiries',                         value:0,  target:20 },
+    calls:       { label:'Onboarding Calls',                          value:0,  target:8  },
+    profiled:    { label:'Investors Profiled (target: 10 by Jul)',     value:0,  target:10 },
   },
   model: {
-    price:       { label: 'Purchase Price',    value: 260000, prefix: '£', editable: true },
-    refurb:      { label: 'Refurb Cost',       value: 10000,  prefix: '£', editable: true },
-    ltv:         { label: 'LTV %',             value: 75,     suffix: '%', editable: true },
-    rate:        { label: 'Mortgage Rate %',   value: 5.5,    suffix: '%', editable: true },
-    rent:        { label: 'Gross Monthly Rent',value: 2000,   prefix: '£', editable: true },
-    voidWks:     { label: 'Void Weeks/yr',     value: 2,      editable: true },
-    agentFee:    { label: 'Agent Fee %',       value: 10,     suffix: '%', editable: true },
-    insurance:   { label: 'Annual Insurance',  value: 300,    prefix: '£', editable: true },
-    maintenance: { label: 'Maintenance %',     value: 1,      suffix: '%', editable: true },
-    factor:      { label: 'Factor/Service Chg',value: 500,    prefix: '£', editable: true },
+    price:       { label:'Purchase Price',        value:260000, prefix:'£' },
+    refurb:      { label:'Refurb / Fit-Out Cost', value:10000,  prefix:'£' },
+    ltv:         { label:'LTV %',                 value:75,     suffix:'%' },
+    rate:        { label:'Mortgage Rate %',       value:5.5,    suffix:'%' },
+    rent:        { label:'Gross Monthly Rent',    value:2000,   prefix:'£' },
+    voidWks:     { label:'Void Weeks / Year',     value:2,      suffix:' wks' },
+    agentFee:    { label:'Letting Agent Fee %',   value:10,     suffix:'%' },
+    insurance:   { label:'Annual Insurance',      value:300,    prefix:'£' },
+    maintenance: { label:'Maintenance % of value',value:1,     suffix:'%' },
+    factor:      { label:'Factor / Service Charge',value:500,  prefix:'£' },
   },
   pipeline: [
-    { id:'G33-001', loc:'Shettleston, Glasgow G33',   strat:'BTL', price:80000,  rent:708,  status:'Sourcing',  notes:'High-yield entry. Market avg £60–100k.' },
-    { id:'G43-001', loc:'Mount Florida, Glasgow G43', strat:'BTL', price:850000, rent:1195, status:'Sourcing',  notes:'Premium yield. Range £775–939k.' },
-    { id:'G32-001', loc:'East End, Glasgow G32',      strat:'BTL', price:95000,  rent:710,  status:'Sourcing',  notes:'Stable 1-bed (8.2–9.8% yield).' },
-    { id:'G31-001', loc:'Dennistoun, Glasgow G31',    strat:'BTL', price:180000, rent:767,  status:'Sourcing',  notes:'Core portfolio. Below 7% — monitor.' },
-    { id:'G1-001',  loc:'City Centre, Glasgow G1/G2', strat:'BTL', price:170000, rent:1131, status:'Sourcing',  notes:'Premium segment. £155–305k range.' },
+    { id:'G33-001', loc:'Shettleston, Glasgow G33',   pc:'G33', strat:'BTL', price:80000,  rent:708,  status:'Sourcing',  notes:'High-yield entry. Market avg £60–100k.' },
+    { id:'G43-001', loc:'Mount Florida, Glasgow G43', pc:'G43', strat:'BTL', price:850000, rent:1195, status:'Sourcing',  notes:'Premium yield 12.1%. Range £775–939k.' },
+    { id:'G32-001', loc:'East End, Glasgow G32',      pc:'G32', strat:'BTL', price:95000,  rent:710,  status:'Sourcing',  notes:'Stable 1-bed yield (8.2–9.8%).' },
+    { id:'G31-001', loc:'Dennistoun, Glasgow G31',    pc:'G31', strat:'BTL', price:180000, rent:767,  status:'Sourcing',  notes:'Core portfolio. Below 7% — monitor.' },
+    { id:'G1-001',  loc:'City Centre, Glasgow G1/G2', pc:'G1',  strat:'BTL', price:170000, rent:1131, status:'Sourcing',  notes:'Premium segment. £155–305k range.' },
   ],
+  investors: [],
 };
 
 function loadState() {
-  try {
-    const saved = localStorage.getItem('spg_dashboard');
-    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULTS));
-  } catch(e) { return JSON.parse(JSON.stringify(DEFAULTS)); }
+  try { const s = localStorage.getItem('spg_v2'); return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULTS)); }
+  catch(e) { return JSON.parse(JSON.stringify(DEFAULTS)); }
 }
 function saveState() {
-  localStorage.setItem('spg_dashboard', JSON.stringify(state));
-  document.getElementById('lastSaved').textContent = 'Auto-saved ' + new Date().toLocaleTimeString();
+  localStorage.setItem('spg_v2', JSON.stringify(state));
+  const el = document.getElementById('lastSaved');
+  if (el) el.textContent = '· Saved ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
 }
 
 let state = loadState();
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  setTimeout(renderCharts, 50);
+}
+
+// ═══════════════════════════════════════
 // INLINE EDITING
-// ═══════════════════════════════════════════════
-function makeEditable(el, getValue, setValue, afterSave) {
+// ═══════════════════════════════════════
+function makeEditable(el, getVal, setVal, afterFn) {
   el.classList.add('editable');
   el.title = 'Click to edit';
   el.addEventListener('click', function(e) {
     if (el.querySelector('input')) return;
-    const cur = getValue();
+    const cur = getVal();
     const inp = document.createElement('input');
     inp.className = 'editable-input';
-    inp.type = 'number';
-    inp.value = cur;
-    inp.style.width = Math.max(60, String(cur).length * 11) + 'px';
+    inp.type = 'number'; inp.value = cur;
+    inp.style.width = Math.max(70, String(cur).length * 11 + 20) + 'px';
     el.textContent = '';
     el.appendChild(inp);
     inp.focus(); inp.select();
     function commit() {
       const v = parseFloat(inp.value);
-      if (!isNaN(v) && v >= 0) { setValue(v); saveState(); if (afterSave) afterSave(); }
+      if (!isNaN(v) && v >= 0) { setVal(v); saveState(); if (afterFn) afterFn(); }
       renderAll();
     }
-    inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') commit(); if (ev.key === 'Escape') renderAll(); });
+    inp.addEventListener('keydown', ev => { if(ev.key==='Enter') commit(); if(ev.key==='Escape') renderAll(); });
     inp.addEventListener('blur', commit);
     e.stopPropagation();
   });
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
 // KPI CARDS
-// ═══════════════════════════════════════════════
-function badgeFor(val, target) {
-  const pct = target > 0 ? val / target : 0;
-  if (pct >= 1)    return ['badge-green', 'On Target ✓'];
-  if (pct >= 0.5)  return ['badge-amber', Math.round(pct*100) + '% of target'];
-  return ['badge-red', 'Below target'];
+// ═══════════════════════════════════════
+function badgeClass(val, target) {
+  const p = target > 0 ? val/target : 0;
+  if (p >= 1) return ['green','badge-green','On Target ✓'];
+  if (p >= 0.5) return ['amber','badge-amber', Math.round(p*100)+'% of target'];
+  return ['red','badge-red','Below target'];
 }
 
 function renderKPIs() {
   const grid = document.getElementById('kpiGrid');
+  if (!grid) return;
   grid.innerHTML = '';
   Object.entries(state.kpis).forEach(([key, kpi]) => {
-    const [cls, txt] = badgeFor(kpi.value, kpi.weeklyTarget);
+    const [cardCls, badgeCls, badgeTxt] = badgeClass(kpi.value, kpi.target);
     const card = document.createElement('div');
-    card.className = 'kpi-card';
+    card.className = `stat-card ${cardCls}`;
     card.innerHTML = `
-      <div class="kpi-label">${kpi.label}</div>
-      <div class="kpi-value" id="kpi-val-${key}">${kpi.value}</div>
-      <div class="kpi-target">Weekly target: <span>${kpi.weeklyTarget}+</span></div>
-      <div><span class="kpi-badge ${cls}">${txt}</span></div>`;
+      <div class="stat-label">${kpi.label}</div>
+      <div class="stat-value" id="kv-${key}">${kpi.value}</div>
+      <div class="stat-meta">Weekly target: <strong>${kpi.target}+</strong></div>
+      <div><span class="stat-badge ${badgeCls}">${badgeTxt}</span></div>`;
     grid.appendChild(card);
-    const valEl = card.querySelector(`#kpi-val-${key}`);
-    makeEditable(valEl, () => kpi.value, v => { kpi.value = v; state.monthly[key] && (state.monthly[key].value = v); });
+    makeEditable(card.querySelector(`#kv-${key}`), () => kpi.value, v => {
+      kpi.value = v;
+      if (state.monthly[key]) state.monthly[key].value = v;
+    });
   });
 }
 
-// ═══════════════════════════════════════════════
-// MONTHLY PROGRESS BARS
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
+// MONTHLY BARS
+// ═══════════════════════════════════════
 function renderMonthly() {
   const el = document.getElementById('monthlyBars');
+  if (!el) return;
   el.innerHTML = '';
   Object.entries(state.monthly).forEach(([key, m]) => {
-    const pct = m.target > 0 ? Math.min(100, (m.value / m.target) * 100) : 0;
+    const pct = m.target > 0 ? Math.min(100, (m.value/m.target)*100) : 0;
     const fillCls = pct >= 100 ? 'green' : '';
     const wrap = document.createElement('div');
-    wrap.className = 'progress-wrap';
+    wrap.className = 'prog-row';
     wrap.innerHTML = `
-      <div class="progress-label">
+      <div class="prog-labels">
         <span class="pl">${m.label}</span>
-        <span class="pr"><span id="mp-val-${key}">${m.value}</span> / ${m.target}</span>
+        <span class="pr"><span id="mv-${key}">${m.value}</span> / ${m.target}</span>
       </div>
-      <div class="progress-bar"><div class="progress-fill ${fillCls}" id="mp-bar-${key}" style="width:${pct}%"></div></div>`;
+      <div class="prog-track"><div class="prog-fill ${fillCls}" style="width:${pct}%"></div></div>`;
     el.appendChild(wrap);
-    const valEl = wrap.querySelector(`#mp-val-${key}`);
-    makeEditable(valEl, () => m.value, v => { m.value = v; if (state.kpis[key]) state.kpis[key].value = v; });
+    makeEditable(wrap.querySelector(`#mv-${key}`), () => m.value, v => {
+      m.value = v;
+      if (state.kpis[key]) state.kpis[key].value = v;
+    });
   });
 }
 
-// ═══════════════════════════════════════════════
-// PIPELINE TABLE
-// ═══════════════════════════════════════════════
-const STATUS_STYLES = {
-  'Sourcing':    'status-sourcing',
-  'Assessing':   'status-analysing',
-  'Packaged':    'status-packaged',
-  'Distributed': 'status-packaged',
-  'Offer Stage': 'status-packaged',
-  'Closed':      'status-closed',
-};
+// ═══════════════════════════════════════
+// OVERVIEW HERO NUMBERS
+// ═══════════════════════════════════════
+function renderHero() {
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('ov-deals', state.pipeline.length);
+  set('ov-investors', state.investors.length);
+  set('ov-packaged', state.monthly.packaged.value);
+  set('ov-assessed', state.monthly.assessed.value);
+}
 
-function yieldClass(y) { return y >= 7 ? 'yield-high' : y >= 5 ? 'yield-mid' : 'yield-low'; }
+// ═══════════════════════════════════════
+// PIPELINE TABLE
+// ═══════════════════════════════════════
+const SSTYLE = {
+  'Sourcing':    's-sourcing',
+  'Assessing':   's-assessing',
+  'Packaged':    's-packaged',
+  'Distributed': 's-distributed',
+  'Offer Stage': 's-offer',
+  'Closed':      's-closed',
+};
+function yieldCls(y) { return y >= 7 ? 'yield-high' : y >= 5 ? 'yield-mid' : 'yield-low'; }
 
 function renderPipeline() {
-  const tbody = document.getElementById('pipelineBody');
-  tbody.innerHTML = '';
-  state.pipeline.forEach((deal, i) => {
-    const yld = deal.price > 0 ? ((deal.rent * 12) / deal.price * 100) : 0;
+  const body = document.getElementById('pipelineBody');
+  if (!body) return;
+  body.innerHTML = '';
+  state.pipeline.forEach((d, i) => {
+    const yld = d.price > 0 ? (d.rent*12/d.price*100) : 0;
+    const sc = SSTYLE[d.status] || 's-sourcing';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="padding-left:8px"><span class="deal-id">${deal.id}</span></td>
-      <td><strong>${deal.loc.split(',')[0]}</strong><br><span style="color:var(--muted);font-size:11px">${deal.loc.split(',').slice(1).join(',').trim()}</span></td>
-      <td>${deal.strat}</td>
-      <td>£<span class="editable" id="p-price-${i}">${deal.price.toLocaleString()}</span></td>
-      <td>£<span class="editable" id="p-rent-${i}">${deal.rent.toLocaleString()}</span>/mo</td>
-      <td><span class="yield-pill ${yieldClass(yld)}">${yld.toFixed(1)}%</span></td>
+      <td style="padding-left:24px"><span class="deal-id">${d.id}</span></td>
       <td>
-        <select class="status-pill ${STATUS_STYLES[deal.status] || 'status-sourcing'}" onchange="updateStatus(${i}, this.value)">
-          ${['Sourcing','Assessing','Packaged','Distributed','Offer Stage','Closed'].map(s => `<option${s===deal.status?' selected':''}>${s}</option>`).join('')}
+        <div style="font-weight:600">${d.loc.split(',')[0]}</div>
+        <div style="font-size:11px;color:var(--slate-light)">${d.loc.split(',').slice(1).join(',').trim()}</div>
+      </td>
+      <td style="font-size:12px;color:var(--slate)">${d.strat}</td>
+      <td>£<span id="pp-${i}" class="editable">${d.price.toLocaleString()}</span></td>
+      <td>£<span id="pr-${i}" class="editable">${d.rent.toLocaleString()}</span>/mo</td>
+      <td><span class="yield-tag ${yieldCls(yld)}">${yld.toFixed(1)}%</span></td>
+      <td>
+        <select class="status-select ${sc}" onchange="updateStatus(${i},this.value)">
+          ${['Sourcing','Assessing','Packaged','Distributed','Offer Stage','Closed'].map(s=>`<option${s===d.status?' selected':''}>${s}</option>`).join('')}
         </select>
       </td>
-      <td style="font-size:11px;color:var(--muted);max-width:180px">${deal.notes}</td>
-      <td><button class="del-deal" onclick="deleteDeal(${i})" title="Remove deal">✕</button></td>`;
-    tbody.appendChild(tr);
-
-    const priceEl = tr.querySelector(`#p-price-${i}`);
-    makeEditable(priceEl, () => deal.price, v => { deal.price = v; }, renderCharts);
-
-    const rentEl = tr.querySelector(`#p-rent-${i}`);
-    makeEditable(rentEl, () => deal.rent, v => { deal.rent = v; }, renderCharts);
+      <td style="font-size:11px;color:var(--slate-light);max-width:160px">${d.notes}</td>
+      <td><button class="del-row" onclick="deleteDeal(${i})" title="Remove">✕</button></td>`;
+    body.appendChild(tr);
+    makeEditable(tr.querySelector(`#pp-${i}`), () => d.price, v => { d.price = v; }, renderCharts);
+    makeEditable(tr.querySelector(`#pr-${i}`), () => d.rent,  v => { d.rent  = v; }, renderCharts);
   });
+  renderPipelineSummary();
 }
 
-function updateStatus(i, val) {
-  state.pipeline[i].status = val;
-  saveState(); renderPipeline();
-}
-function deleteDeal(i) {
-  if (confirm('Remove this deal from the pipeline?')) {
-    state.pipeline.splice(i, 1);
-    saveState(); renderAll();
+function renderPipelineSummary() {
+  // Stage breakdown
+  const sb = document.getElementById('stageBreakdown');
+  if (sb) {
+    const stages = {};
+    state.pipeline.forEach(d => stages[d.status] = (stages[d.status]||0)+1);
+    sb.innerHTML = '';
+    const total = state.pipeline.length || 1;
+    Object.entries(stages).forEach(([s, cnt]) => {
+      const pct = Math.round(cnt/total*100);
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+          <span style="color:var(--slate)">${s}</span><span style="font-weight:700">${cnt}</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:var(--charcoal)"></div></div>`;
+      sb.appendChild(div);
+    });
+  }
+
+  // Pipeline summary
+  const ps = document.getElementById('pipeSummary');
+  if (ps) {
+    const totalVal = state.pipeline.reduce((a,d) => a + d.price, 0);
+    const avgYield = state.pipeline.length ? state.pipeline.reduce((a,d) => a + (d.price>0 ? d.rent*12/d.price*100 : 0), 0) / state.pipeline.length : 0;
+    const high = state.pipeline.filter(d => (d.price>0 ? d.rent*12/d.price*100 : 0) >= 7).length;
+    ps.innerHTML = `
+      <div class="model-row"><span class="model-key">Total Deals in Pipeline</span><span class="model-val">${state.pipeline.length}</span></div>
+      <div class="model-row"><span class="model-key">Total Pipeline Value</span><span class="model-val">£${(totalVal/1000000).toFixed(2)}m</span></div>
+      <div class="model-row"><span class="model-key">Avg Gross Yield</span><span class="model-val ${avgYield>=7?'green':'amber'}">${avgYield.toFixed(1)}%</span></div>
+      <div class="model-row"><span class="model-key">Deals Meeting 7%+ Target</span><span class="model-val green">${high} / ${state.pipeline.length}</span></div>`;
   }
 }
-function toggleAddDeal() {
-  const f = document.getElementById('addDealForm');
-  f.classList.toggle('open');
+
+function updateStatus(i, val) { state.pipeline[i].status = val; saveState(); renderPipeline(); }
+function deleteDeal(i) {
+  if (confirm('Remove this deal?')) { state.pipeline.splice(i,1); saveState(); renderAll(); }
 }
+function toggleDealForm() { document.getElementById('dealForm').classList.toggle('open'); }
 function addDeal() {
   const id    = document.getElementById('nd-id').value.trim();
   const loc   = document.getElementById('nd-loc').value.trim();
+  const pc    = document.getElementById('nd-pc').value.trim();
   const strat = document.getElementById('nd-strat').value;
   const price = parseFloat(document.getElementById('nd-price').value) || 0;
-  const rent  = parseFloat(document.getElementById('nd-rent').value) || 0;
+  const rent  = parseFloat(document.getElementById('nd-rent').value)  || 0;
   const status= document.getElementById('nd-status').value;
-  if (!id || !loc) { alert('Please enter at least a Deal ID and Location.'); return; }
-  state.pipeline.push({ id, loc, strat, price, rent, status, notes: '' });
+  const notes = document.getElementById('nd-notes').value.trim();
+  if (!id || !loc) { alert('Please enter Deal ID and Location.'); return; }
+  state.pipeline.push({ id, loc, pc, strat, price, rent, status, notes });
   saveState();
-  document.getElementById('addDealForm').classList.remove('open');
-  ['nd-id','nd-loc','nd-price','nd-rent'].forEach(x => document.getElementById(x).value = '');
+  document.getElementById('dealForm').classList.remove('open');
+  ['nd-id','nd-loc','nd-pc','nd-price','nd-rent','nd-notes'].forEach(x => document.getElementById(x).value='');
   renderAll();
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
 // DEAL ANALYSIS MODEL
-// ═══════════════════════════════════════════════
-function calcModel(m) {
-  const total     = m.price.value + m.refurb.value;
-  const mortgage  = m.price.value * (m.ltv.value / 100);
-  const deposit   = m.price.value - mortgage;
-  const mthlyMtg  = mortgage * (m.rate.value / 100) / 12;
-  const effRent   = m.rent.value * (52 - m.voidWks.value) / 52 * 12;
-  const agentAnn  = effRent * (m.agentFee.value / 100);
-  const maintAnn  = m.price.value * (m.maintenance.value / 100);
-  const totalCosts= agentAnn + m.insurance.value + maintAnn + m.factor.value;
-  const grossYld  = m.price.value > 0 ? (m.rent.value * 12) / m.price.value * 100 : 0;
-  const netIncome = effRent - totalCosts - mthlyMtg * 12;
-  const netYld    = total > 0 ? netIncome / total * 100 : 0;
-  const mthCF     = (effRent - totalCosts) / 12 - mthlyMtg;
-  return { total, mortgage, deposit, mthlyMtg, grossYld, netYld, mthCF };
+// ═══════════════════════════════════════
+function calcModel() {
+  const m = state.model;
+  const total    = m.price.value + m.refurb.value;
+  const mortgage = m.price.value * (m.ltv.value / 100);
+  const deposit  = m.price.value - mortgage;
+  const mthMtg   = mortgage * (m.rate.value / 100) / 12;
+  const effRent  = m.rent.value * (52 - m.voidWks.value) / 52 * 12;
+  const agentAnn = effRent * (m.agentFee.value / 100);
+  const maintAnn = m.price.value * (m.maintenance.value / 100);
+  const costs    = agentAnn + m.insurance.value + maintAnn + m.factor.value;
+  const grossYld = m.price.value > 0 ? (m.rent.value * 12) / m.price.value * 100 : 0;
+  const netInc   = effRent - costs - mthMtg * 12;
+  const netYld   = total > 0 ? netInc / total * 100 : 0;
+  const mthCF    = (effRent - costs) / 12 - mthMtg;
+  return { total, mortgage, deposit, mthMtg, grossYld, netYld, mthCF, effRent, costs };
+}
+
+function fmt(val, prefix, suffix) {
+  if (prefix === '£') return '£' + Math.round(val).toLocaleString();
+  if (suffix === '%') return val.toFixed(1) + '%';
+  return val + (suffix || '');
 }
 
 function renderModel() {
-  const m   = state.model;
-  const out = calcModel(m);
-  const container = document.getElementById('modelRows');
-  container.innerHTML = '';
+  const m = state.model;
+  const out = calcModel();
 
-  const inputRows = [
-    ['price','rent','ltv','rate','voidWks','agentFee','insurance','maintenance','factor','refurb']
-      .map(k => ({ key: k, ...m[k] }))
-  ].flat();
+  const inp = document.getElementById('modelInputs');
+  if (inp) {
+    inp.innerHTML = '';
+    Object.entries(m).forEach(([key, row]) => {
+      const div = document.createElement('div');
+      div.className = 'model-row';
+      const display = fmt(row.value, row.prefix, row.suffix);
+      div.innerHTML = `<span class="model-key">${row.label}</span><span class="model-val" id="mi-${key}">${display}</span>`;
+      inp.appendChild(div);
+      makeEditable(div.querySelector(`#mi-${key}`), () => row.value, v => { m[key].value = v; }, renderAll);
+    });
+  }
 
-  const outputRows = [
-    { label: 'Total Invested',   val: `£${Math.round(out.total).toLocaleString()}`,       cls: '' },
-    { label: 'Mortgage Amount',  val: `£${Math.round(out.mortgage).toLocaleString()}`,    cls: '' },
-    { label: 'Deposit Required', val: `£${Math.round(out.deposit).toLocaleString()}`,     cls: '' },
-    { label: 'Monthly Mortgage', val: `£${out.mthlyMtg.toFixed(0)}`,                      cls: '' },
-    { label: 'Gross Yield',      val: `${out.grossYld.toFixed(2)}%`,                       cls: 'green' },
-    { label: 'Net Yield',        val: `${out.netYld.toFixed(2)}%`,                         cls: out.netYld >= 4 ? 'green' : 'amber' },
-    { label: 'Monthly Cashflow', val: `£${out.mthCF.toFixed(0)}`,                          cls: out.mthCF >= 0 ? 'green' : 'amber' },
-  ];
+  const outp = document.getElementById('modelOutputs');
+  if (outp) {
+    const rows = [
+      { label:'Total Invested',    val:'£'+Math.round(out.total).toLocaleString(),    cls:'' },
+      { label:'Mortgage Amount',   val:'£'+Math.round(out.mortgage).toLocaleString(), cls:'' },
+      { label:'Deposit Required',  val:'£'+Math.round(out.deposit).toLocaleString(),  cls:'' },
+      { label:'Monthly Mortgage',  val:'£'+out.mthMtg.toFixed(0)+'/mo',              cls:'' },
+      { label:'Effective Ann. Rent',val:'£'+Math.round(out.effRent).toLocaleString(),cls:'' },
+      { label:'Total Annual Costs',val:'£'+Math.round(out.costs).toLocaleString(),   cls:'' },
+      { label:'Gross Yield',       val:out.grossYld.toFixed(2)+'%',                   cls: out.grossYld>=7?'green':'amber' },
+      { label:'Net Yield (on total invested)', val:out.netYld.toFixed(2)+'%',          cls: out.netYld>=3?'green':'amber' },
+      { label:'Monthly Cashflow',  val:'£'+out.mthCF.toFixed(0)+'/mo',               cls: out.mthCF>=0?'green':'amber' },
+    ];
+    outp.innerHTML = rows.map(r => `
+      <div class="model-row output">
+        <span class="model-key">${r.label}</span>
+        <span class="model-val ${r.cls}">${r.val}</span>
+      </div>`).join('');
+  }
 
-  // Inputs
-  const inputSection = document.createElement('div');
-  inputSection.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px">Inputs</div>';
-  inputRows.forEach(row => {
-    const div = document.createElement('div');
-    div.className = 'analysis-row';
-    const fmt = row.prefix ? row.prefix + row.value.toLocaleString() : row.value + (row.suffix || '');
-    div.innerHTML = `<span class="akey">${row.label}</span><span class="aval" id="model-${row.key}">${fmt}</span>`;
-    inputSection.appendChild(div);
-    const el = div.querySelector(`#model-${row.key}`);
-    makeEditable(el, () => row.value, v => { m[row.key].value = v; }, renderAll);
-  });
-  container.appendChild(inputSection);
-
-  // Outputs
-  const outputSection = document.createElement('div');
-  outputSection.style.marginTop = '12px';
-  outputSection.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px">Outputs (auto-calculated)</div>';
-  outputRows.forEach(row => {
-    const div = document.createElement('div');
-    div.className = 'analysis-row';
-    div.innerHTML = `<span class="akey">${row.label}</span><span class="aval ${row.cls}">${row.val}</span>`;
-    outputSection.appendChild(div);
-  });
-  container.appendChild(outputSection);
+  renderStressMatrix();
 }
 
-// ═══════════════════════════════════════════════
+function renderStressMatrix() {
+  const el = document.getElementById('stressMatrix');
+  if (!el) return;
+  const m = state.model;
+  const mortgage150 = 150000 * (m.ltv.value / 100);
+  const effRent = m.rent.value * (52 - m.voidWks.value) / 52 * 12;
+  const annCosts = effRent*(m.agentFee.value/100) + m.insurance.value + 150000*(m.maintenance.value/100) + m.factor.value;
+  const rates = [3.5,4,4.5,5,5.5,6,6.5,7,7.5,8];
+  const rentChanges = [-0.2,-0.1,-0.05,0,0.05,0.1,0.2];
+
+  let html = `<table style="border-collapse:collapse;font-size:12px;min-width:600px;">
+    <thead><tr><th style="padding:8px 12px;text-align:left;color:var(--slate-light);font-size:10px;letter-spacing:1px;text-transform:uppercase;">Rate ↓ / Rent →</th>`;
+  rentChanges.forEach(rc => {
+    html += `<th style="padding:8px 12px;color:var(--slate-light);font-size:10px;letter-spacing:1px;text-transform:uppercase;text-align:center;">${rc>0?'+':''}${(rc*100).toFixed(0)}%</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  rates.forEach(rate => {
+    html += `<tr><td style="padding:8px 12px;font-weight:700;color:var(--charcoal);">${rate}%</td>`;
+    rentChanges.forEach(rc => {
+      const mthMtg = mortgage150 * (rate/100) / 12;
+      const adjRent = m.rent.value * (1 + rc);
+      const adjEff  = adjRent * (52 - m.voidWks.value) / 52 * 12;
+      const adjCosts = adjEff*(m.agentFee.value/100) + m.insurance.value + 150000*(m.maintenance.value/100) + m.factor.value;
+      const cf = (adjEff - adjCosts)/12 - mthMtg;
+      let bg, col;
+      if (cf >= 100)  { bg='#E8F5EE'; col=`color:${getComputedStyle(document.documentElement).getPropertyValue('--green')}`; }
+      else if (cf >= 0) { bg='#FDF3E3'; col=`color:${getComputedStyle(document.documentElement).getPropertyValue('--amber')}`; }
+      else             { bg='#F9EBED'; col=`color:${getComputedStyle(document.documentElement).getPropertyValue('--red')}`; }
+      const isBase = Math.abs(rate - m.rate.value) < 0.01 && rc === 0;
+      html += `<td style="padding:8px 12px;text-align:center;background:${bg};${col};font-weight:${isBase?'700':'500'};border:${isBase?'2px solid #B8965A':'1px solid #EDE9E2'};">£${Math.round(cf)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// INVESTORS
+// ═══════════════════════════════════════
+function renderInvestors() {
+  const grid = document.getElementById('investorGrid');
+  if (!grid) return;
+  const active  = state.investors.filter(i => i.status==='Active').length;
+  const passive = state.investors.filter(i => i.status==='Passive').length;
+  const warm    = state.investors.filter(i => i.status==='Warm').length;
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setEl('inv-active-count', active);
+  setEl('inv-profiled-count', state.investors.length);
+  setEl('inv-passive-count', passive);
+  setEl('ov-investors', state.investors.length);
+
+  if (state.investors.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--slate-light);font-size:14px;font-style:italic;">No investors added yet. Use the button above to add your first investor.</div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  state.investors.forEach((inv, i) => {
+    const statusCls = inv.status==='Active'?'inv-active':inv.status==='Warm'?'inv-warm':'inv-passive';
+    const card = document.createElement('div');
+    card.className = 'investor-card';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="inv-name">${inv.name}</div>
+        <button class="del-row" onclick="deleteInvestor(${i})" style="font-size:12px;padding:2px 6px;">✕</button>
+      </div>
+      <span class="inv-status ${statusCls}">${inv.status}</span>
+      <div class="inv-detail">Strategy: <strong>${inv.strat}</strong></div>
+      <div class="inv-detail">Budget: <strong>£${(inv.budget||0).toLocaleString()}</strong></div>
+      <div class="inv-detail">Funding: <strong>${inv.fund}</strong></div>
+      <div class="inv-detail">Target: <strong>${inv.yield}</strong></div>
+      ${inv.notes ? `<div class="inv-detail" style="font-style:italic">${inv.notes}</div>` : ''}`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleInvForm() { document.getElementById('invForm').classList.toggle('open'); }
+function addInvestor() {
+  const name   = document.getElementById('inv-name').value.trim();
+  const strat  = document.getElementById('inv-strat').value;
+  const budget = parseFloat(document.getElementById('inv-budget').value) || 0;
+  const yield_ = document.getElementById('inv-yield').value.trim();
+  const fund   = document.getElementById('inv-fund').value;
+  const status = document.getElementById('inv-status').value;
+  const notes  = document.getElementById('inv-notes').value.trim();
+  if (!name) { alert('Please enter the investor name.'); return; }
+  state.investors.push({ name, strat, budget, yield: yield_, fund, status, notes });
+  saveState();
+  document.getElementById('invForm').classList.remove('open');
+  ['inv-name','inv-budget','inv-yield','inv-notes'].forEach(x => document.getElementById(x).value='');
+  renderAll();
+}
+function deleteInvestor(i) {
+  if (confirm('Remove this investor?')) { state.investors.splice(i,1); saveState(); renderAll(); }
+}
+
+// ═══════════════════════════════════════
 // CHARTS
-// ═══════════════════════════════════════════════
-let yieldChartInst = null, rateChartInst = null;
+// ═══════════════════════════════════════
+const charts = {};
+function destroyChart(id) { if(charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+const CHART_DEFAULTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+};
 
 function renderCharts() {
-  // Yield chart
+  renderYieldChart('yieldChartOv');
+  renderYieldChart('yieldChartPipe');
+  renderMarketChart();
+  renderRateChart();
+  renderAllYieldChart();
+}
+
+function renderYieldChart(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  destroyChart(canvasId);
   const deals = state.pipeline.filter(d => d.price > 0);
   const labels = deals.map(d => d.id);
-  const yields = deals.map(d => +((d.rent * 12 / d.price) * 100).toFixed(1));
-  const colors = yields.map(y => y >= 7 ? '#2e7d4f' : y >= 5 ? '#d48a00' : '#c0392b');
+  const yields = deals.map(d => +((d.rent*12/d.price)*100).toFixed(1));
+  const colors = yields.map(y => y>=7 ? '#2D6A4F' : y>=5 ? '#B5730A' : '#9B2335');
 
-  const yCtx = document.getElementById('yieldChart').getContext('2d');
-  if (yieldChartInst) yieldChartInst.destroy();
-  yieldChartInst = new Chart(yCtx, {
+  charts[canvasId] = new Chart(canvas.getContext('2d'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [{ label: 'Gross Yield %', data: yields, backgroundColor: colors, borderRadius: 5, borderSkipped: false }]
-    },
+    data: { labels, datasets: [{ data: yields, backgroundColor: colors, borderRadius: 3, borderSkipped: false }] },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw}% gross yield` } } },
+      ...CHART_DEFAULTS,
       scales: {
-        y: { beginAtZero: true, max: Math.max(20, ...yields) + 2, grid: { color: '#f0f3f8' }, ticks: { callback: v => v + '%', font: { size: 11 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+        y: { beginAtZero:true, max: Math.max(20,...yields)+2,
+             grid:{color:'#EDE9E2'}, ticks:{callback:v=>v+'%', font:{size:10}, color:'#8A9BAD'} },
+        x: { grid:{display:false}, ticks:{font:{size:10}, color:'#8A9BAD'} }
+      },
+      plugins: {
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>` ${c.raw}% gross yield`}}
       }
     },
     plugins: [{
-      id: 'threshold',
+      id:'thresh'+canvasId,
       afterDraw(chart) {
-        const { ctx, scales: { y } } = chart;
+        const {ctx, scales:{y}} = chart;
         const yPx = y.getPixelForValue(7);
         ctx.save();
-        ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.5; ctx.setLineDash([4,4]);
-        ctx.beginPath();
-        ctx.moveTo(chart.chartArea.left, yPx); ctx.lineTo(chart.chartArea.right, yPx);
-        ctx.stroke();
-        ctx.fillStyle = '#c0392b'; ctx.font = '10px Segoe UI';
-        ctx.fillText('7% min', chart.chartArea.right - 42, yPx - 4);
+        ctx.strokeStyle='#9B2335'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(chart.chartArea.left,yPx); ctx.lineTo(chart.chartArea.right,yPx); ctx.stroke();
+        ctx.fillStyle='#9B2335'; ctx.font='10px Inter';
+        ctx.fillText('7% min', chart.chartArea.right-42, yPx-4);
         ctx.restore();
       }
     }]
   });
+}
 
-  // Rate chart
-  const m   = state.model;
-  const out = calcModel(m);
-  const mortgage150 = 150000 * (m.ltv.value / 100);
-  const effRent = m.rent.value * (52 - m.voidWks.value) / 52 * 12;
-  const annCosts = effRent * (m.agentFee.value / 100) + m.insurance.value + 150000 * (m.maintenance.value / 100) + m.factor.value;
-
-  const rates = [3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9];
-  const cashflows = rates.map(r => {
-    const mthMtg = mortgage150 * (r / 100) / 12;
-    return +((effRent - annCosts) / 12 - mthMtg).toFixed(2);
-  });
-
-  const rCtx = document.getElementById('rateChart').getContext('2d');
-  if (rateChartInst) rateChartInst.destroy();
-  rateChartInst = new Chart(rCtx, {
-    type: 'line',
-    data: {
-      labels: rates.map(r => r + '%'),
-      datasets: [{
-        label: 'Monthly Cashflow (£)', data: cashflows,
-        borderColor: '#c8a84b', backgroundColor: 'rgba(200,168,75,0.12)',
-        borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#c8a84b',
-        fill: true, tension: 0.3,
-      }]
-    },
+function renderMarketChart() {
+  const canvas = document.getElementById('marketChartOv');
+  if (!canvas) return;
+  destroyChart('marketChartOv');
+  const labels = ['G33 Shettleston','G43 Mt Florida','G5 Gorbals','G51 Ibrox','G32 East End','G1/G2 City Ctr','G41 Govanhill','G31 Dennistoun','G42 Govan'];
+  const yields = [14.3, 12.1, 10.5, 9.2, 8.9, 8.0, 6.1, 5.1, 3.9];
+  const colors = yields.map(y => y>=7?'#2D6A4F':y>=5?'#B5730A':'#9B2335');
+  charts['marketChartOv'] = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: yields, backgroundColor: colors, borderRadius: 3, borderSkipped: false }] },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` £${c.raw.toFixed(0)}/mo` } } },
+      ...CHART_DEFAULTS,
+      indexAxis: 'y',
       scales: {
-        y: { grid: { color: '#f0f3f8' }, ticks: { callback: v => '£' + v, font: { size: 10 } } },
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
-      }
+        x: { beginAtZero:true, max:17, grid:{color:'#EDE9E2'}, ticks:{callback:v=>v+'%',font:{size:10},color:'#8A9BAD'} },
+        y: { grid:{display:false}, ticks:{font:{size:10},color:'#5A6B7D'} }
+      },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}% gross yield (1-bed)`}}}
     }
   });
 }
 
-// ═══════════════════════════════════════════════
+function renderAllYieldChart() {
+  const canvas = document.getElementById('allYieldChart');
+  if (!canvas) return;
+  destroyChart('allYieldChart');
+  const labels = ['G33 Shettleston','G43 Mt Florida','G5 Gorbals','G51 Ibrox','G32 East End','G1/G2 City Ctr','G41 Govanhill','G31 Dennistoun','G42 Govan'];
+  const yields = [14.3, 12.1, 10.5, 9.2, 8.9, 8.0, 6.1, 5.1, 3.9];
+  const colors = yields.map(y => y>=7?'#2D6A4F':y>=5?'#B5730A':'#9B2335');
+  charts['allYieldChart'] = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label:'Gross Yield %', data: yields, backgroundColor: colors, borderRadius: 3, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero:true, max:18, grid:{color:'#EDE9E2'}, ticks:{callback:v=>v+'%',font:{size:11},color:'#8A9BAD'} },
+        x: { grid:{display:false}, ticks:{font:{size:11},color:'#5A6B7D'} }
+      },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.raw}% gross yield`}}}
+    },
+    plugins: [{
+      id:'thresh2',
+      afterDraw(chart) {
+        const {ctx,scales:{y}} = chart;
+        const yPx = y.getPixelForValue(7);
+        ctx.save();
+        ctx.strokeStyle='#9B2335'; ctx.lineWidth=1.5; ctx.setLineDash([5,5]);
+        ctx.beginPath(); ctx.moveTo(chart.chartArea.left,yPx); ctx.lineTo(chart.chartArea.right,yPx); ctx.stroke();
+        ctx.fillStyle='#9B2335'; ctx.font='11px Inter';
+        ctx.fillText('7% BTL minimum', chart.chartArea.right-110, yPx-6);
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+function renderRateChart() {
+  const canvas = document.getElementById('rateChart');
+  if (!canvas) return;
+  destroyChart('rateChart');
+  const m = state.model;
+  const mortgage150 = 150000 * (m.ltv.value / 100);
+  const effRent  = m.rent.value * (52 - m.voidWks.value) / 52 * 12;
+  const annCosts = effRent*(m.agentFee.value/100) + m.insurance.value + 150000*(m.maintenance.value/100) + m.factor.value;
+  const rates = [3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9];
+  const cfs   = rates.map(r => +((effRent - annCosts)/12 - mortgage150*(r/100)/12).toFixed(0));
+  charts['rateChart'] = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: rates.map(r=>r+'%'),
+      datasets: [{
+        data: cfs,
+        borderColor: '#B8965A', backgroundColor: 'rgba(184,150,90,0.1)',
+        borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#B8965A',
+        fill: true, tension: 0.3,
+      }]
+    },
+    options: {
+      ...CHART_DEFAULTS,
+      scales: {
+        y: { grid:{color:'#EDE9E2'}, ticks:{callback:v=>'£'+v,font:{size:10},color:'#8A9BAD'} },
+        x: { grid:{display:false}, ticks:{font:{size:10},color:'#8A9BAD'} }
+      },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` £${c.raw}/mo cashflow`}}}
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+// DATE
+// ═══════════════════════════════════════
+function updateDate() {
+  const el = document.getElementById('currentDate');
+  if (!el) return;
+  el.textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+updateDate();
+setInterval(updateDate, 60000);
+
+// ═══════════════════════════════════════
 // RENDER ALL
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
 function renderAll() {
   renderKPIs();
   renderMonthly();
+  renderHero();
   renderPipeline();
   renderModel();
+  renderInvestors();
   renderCharts();
 }
 
 renderAll();
-
-// Live date
-function updateDate() {
-  const now = new Date();
-  document.getElementById('currentDate').textContent = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-}
-updateDate();
-setInterval(updateDate, 60000);
 </script>
 </body>
 </html>
