@@ -241,7 +241,10 @@
       <div class="company-sub">Operations Dashboard</div>
     </div>
   </div>
-  <div class="header-right">Current Phase: <strong>Active Operations — Deal Sourcing</strong> &nbsp;|&nbsp; Target: <strong>First Deal Closed Nov 2026</strong></div>
+  <div class="header-right" style="text-align:right;">
+    <div>Current Phase: <strong>Active Operations — Deal Sourcing</strong> &nbsp;|&nbsp; Target: <strong>First Deal Closed Nov 2026</strong></div>
+    <div style="color:var(--gold);font-size:12px;margin-top:3px;" id="currentDate"></div>
+  </div>
 </header>
 
 <div class="page">
@@ -804,6 +807,14 @@ function renderAll() {
 }
 
 renderAll();
+
+// Live date
+function updateDate() {
+  const now = new Date();
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+updateDate();
+setInterval(updateDate, 60000);
 </script>
 </body>
 </html>
