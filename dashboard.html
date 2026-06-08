@@ -646,6 +646,7 @@
   <div class="nav-tab" onclick="switchTab('market')">Market Intelligence</div>
   <div class="nav-tab" onclick="switchTab('analysis')">Deal Analysis</div>
   <div class="nav-tab" onclick="switchTab('investors')">Investors</div>
+  <div class="nav-tab" onclick="switchTab('agents')">Agents &amp; Sellers</div>
   <div class="nav-tab" onclick="switchTab('roadmap')">Roadmap</div>
   <div class="nav-tab" onclick="switchTab('operations')">Operations</div>
 </nav>
@@ -1079,6 +1080,133 @@
 <!-- ═══════════════════════════════════════════
      TAB 6 — ROADMAP
 ═══════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════
+     TAB — AGENTS & SELLERS
+═══════════════════════════════════════════ -->
+<div class="tab-section" id="tab-agents">
+
+  <div class="section-header">
+    <h2>Agents &amp; Sellers</h2>
+    <span class="sub">Track every estate agent and direct seller relationship</span>
+  </div>
+
+  <!-- Summary stats -->
+  <div class="grid-4" style="margin-bottom:24px;">
+    <div class="stat-card green">
+      <div class="stat-label">Active Relationships</div>
+      <div class="stat-value" id="ag-active-count">0</div>
+      <div class="stat-meta">Target: <strong>3–4 by end July</strong></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Contacts</div>
+      <div class="stat-value" id="ag-total-count">0</div>
+      <div class="stat-meta">Agents + direct sellers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Deals Received</div>
+      <div class="stat-value" id="ag-deals-count">0</div>
+      <div class="stat-meta">From agent sources</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Priority Agents</div>
+      <div class="stat-value" id="ag-priority-count">0</div>
+      <div class="stat-meta">Tier 1 area focus</div>
+    </div>
+  </div>
+
+  <!-- Add contact button + form -->
+  <button class="add-btn" onclick="toggleAgentForm()">+ Add Agent / Seller</button>
+  <div class="deal-form" id="agentForm" style="grid-template-columns: repeat(auto-fit,minmax(150px,1fr));">
+    <div class="ff"><label>Name</label><input id="ag-name" placeholder="e.g. John Smith"/></div>
+    <div class="ff"><label>Agency / Company</label><input id="ag-agency" placeholder="e.g. Clyde Property"/></div>
+    <div class="ff"><label>Type</label>
+      <select id="ag-type">
+        <option>Estate Agent</option>
+        <option>Letting Agent</option>
+        <option>Direct Seller</option>
+        <option>Auction House</option>
+        <option>Solicitor</option>
+        <option>Mortgage Broker</option>
+        <option>Property Manager</option>
+        <option>Contractor / Developer</option>
+      </select>
+    </div>
+    <div class="ff"><label>Area / Postcode</label><input id="ag-area" placeholder="e.g. G33 Shettleston"/></div>
+    <div class="ff"><label>Phone</label><input id="ag-phone" placeholder="07xxx xxxxxx"/></div>
+    <div class="ff"><label>Email</label><input id="ag-email" placeholder="name@agency.co.uk"/></div>
+    <div class="ff"><label>Relationship Status</label>
+      <select id="ag-status">
+        <option>New — Not Contacted</option>
+        <option>Contacted — Awaiting Reply</option>
+        <option>Active — Sending Deals</option>
+        <option>Strong — Off-Market Access</option>
+        <option>Cold — No Response</option>
+      </select>
+    </div>
+    <div class="ff"><label>Deals Received</label><input id="ag-deals" type="number" placeholder="0"/></div>
+    <div class="ff"><label>Notes</label><input id="ag-notes" placeholder="Speciality, how we met..."/></div>
+    <button class="ff-submit" onclick="addAgent()">Add Contact</button>
+  </div>
+
+  <!-- Contact cards grid -->
+  <div id="agentGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--slate-light);font-size:14px;font-style:italic;">
+      No contacts added yet. Use the button above to log your first agent or seller relationship.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Priority agent targets (from strategy doc) -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Priority Agent Targets — Tier 1 Areas</div>
+      <div style="font-size:12px;color:var(--slate-light);margin-bottom:14px;">From sourcing strategy: Week 1 priority actions</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="crit-row" style="border-left-color:var(--charcoal);">
+          <div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:2px;">G33 Shettleston — Top Priority ⭐</div>
+            <div style="font-size:12px;color:var(--slate)">Top 5 independent agents · Property refurb/flip contractors · Off-market inventory. Target: 2–3 deals/month</div>
+          </div>
+        </div>
+        <div class="crit-row" style="border-left-color:var(--charcoal);">
+          <div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:2px;">G43 Mount Florida</div>
+            <div style="font-size:12px;color:var(--slate)">Larger independent agencies · Investment property specialists. Target: 1 deal/month</div>
+          </div>
+        </div>
+        <div class="crit-row" style="border-left-color:var(--charcoal);">
+          <div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:2px;">G32 East End</div>
+            <div style="font-size:12px;color:var(--slate)">Volume agents · Buy-to-let specialists. Target: 2–3 deals/month</div>
+          </div>
+        </div>
+        <div class="crit-row" style="border-left-color:var(--gold);">
+          <div>
+            <div style="font-weight:700;font-size:13px;margin-bottom:2px;">East Glasgow Portfolio Managers (Week 2)</div>
+            <div style="font-size:12px;color:var(--slate)">2–3 relationships in G31, G32, G33 — access to institutional off-market deals</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Sourcing Channels to Build</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="crit-row"><span class="crit-key">Rightmove / Zoopla / OTM</span><span class="crit-val">Daily — new listings &amp; price reductions</span></div>
+        <div class="crit-row"><span class="crit-key">Scottish Property Centre</span><span class="crit-val">Glasgow specialist portal</span></div>
+        <div class="crit-row"><span class="crit-key">Purple Bricks / Strike</span><span class="crit-val">Private / motivated sellers</span></div>
+        <div class="crit-row"><span class="crit-key">Essential Property Auctions</span><span class="crit-val">Auction House Scotland</span></div>
+        <div class="crit-row"><span class="crit-key">SDL Auctions Scotland</span><span class="crit-val">Auction — motivated sellers</span></div>
+        <div class="crit-row"><span class="crit-key">Direct to Vendor</span><span class="crit-val">Leaflet drops · Facebook Marketplace · Gumtree</span></div>
+        <div class="crit-row"><span class="crit-key">Probate &amp; Repossession</span><span class="crit-val">Solicitors handling estates · lender stock</span></div>
+        <div class="crit-row"><span class="crit-key">Facebook Groups</span><span class="crit-val">Property Investors Network Scotland · Glasgow Property Investment Hub</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /agents -->
+
 <div class="tab-section" id="tab-roadmap">
 
   <div class="section-header">
@@ -1390,6 +1518,7 @@ const DEFAULTS = {
     { id:'G1-001',  loc:'City Centre, Glasgow G1/G2', pc:'G1',  strat:'BTL', price:170000, rent:1131, status:'Sourcing',  notes:'Premium segment. £155–305k range.' },
   ],
   investors: [],
+  agents: [],
 };
 
 function loadState() {
@@ -1935,6 +2064,100 @@ setInterval(updateDate, 60000);
 // ═══════════════════════════════════════
 // RENDER ALL
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+// AGENTS & SELLERS
+// ═══════════════════════════════════════
+const STATUS_COLOUR = {
+  'New — Not Contacted':       { bg:'#EDE9E2', col:'#5A6B7D' },
+  'Contacted — Awaiting Reply':{ bg:'#EBF2FF', col:'#2855A8' },
+  'Active — Sending Deals':    { bg:'#E8F5EE', col:'#2D6A4F' },
+  'Strong — Off-Market Access':{ bg:'#1C2B3A', col:'#B8965A' },
+  'Cold — No Response':        { bg:'#F9EBED', col:'#9B2335' },
+};
+const TYPE_ICON = {
+  'Estate Agent':'🏠', 'Letting Agent':'🔑', 'Direct Seller':'👤',
+  'Auction House':'🔨', 'Solicitor':'⚖️', 'Mortgage Broker':'🏦',
+  'Property Manager':'📋', 'Contractor / Developer':'🔧',
+};
+
+function renderAgents() {
+  if (!state.agents) state.agents = [];
+  const grid = document.getElementById('agentGrid');
+  if (!grid) return;
+
+  const total    = state.agents.length;
+  const active   = state.agents.filter(a => a.status === 'Active — Sending Deals' || a.status === 'Strong — Off-Market Access').length;
+  const priority = state.agents.filter(a => ['G33','G43','G32'].some(pc => (a.area||'').includes(pc))).length;
+  const dealsRx  = state.agents.reduce((s, a) => s + (parseInt(a.deals) || 0), 0);
+
+  const setEl = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+  setEl('ag-total-count',    total);
+  setEl('ag-active-count',   active);
+  setEl('ag-priority-count', priority);
+  setEl('ag-deals-count',    dealsRx);
+
+  if (total === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--slate-light);font-size:14px;font-style:italic;">No contacts added yet. Use the button above to log your first agent or seller relationship.</div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  state.agents.forEach((ag, i) => {
+    const sc = STATUS_COLOUR[ag.status] || { bg:'#EDE9E2', col:'#5A6B7D' };
+    const icon = TYPE_ICON[ag.type] || '📋';
+    const card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:4px;padding:16px 18px;box-shadow:0 1px 4px var(--shadow);display:flex;flex-direction:column;gap:7px;';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:11px;color:var(--slate-light);margin-bottom:3px;">${icon} ${ag.type}</div>
+          <div style="font-weight:700;font-size:15px;color:var(--charcoal);">${ag.name}</div>
+          <div style="font-size:13px;color:var(--slate);font-weight:500;">${ag.agency || '—'}</div>
+        </div>
+        <button class="del-row" onclick="deleteAgent(${i})" style="font-size:12px;padding:2px 6px;">✕</button>
+      </div>
+      <div style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:3px 9px;border-radius:2px;background:${sc.bg};color:${sc.col};align-self:flex-start;">${ag.status}</div>
+      ${ag.area  ? `<div style="font-size:12px;color:var(--slate);">📍 <strong>${ag.area}</strong></div>` : ''}
+      ${ag.phone ? `<div style="font-size:12px;color:var(--slate);">📞 <a href="tel:${ag.phone}" style="color:var(--charcoal);text-decoration:none;font-weight:600;">${ag.phone}</a></div>` : ''}
+      ${ag.email ? `<div style="font-size:12px;color:var(--slate);">✉️ <a href="mailto:${ag.email}" style="color:var(--gold);text-decoration:none;">${ag.email}</a></div>` : ''}
+      ${ag.deals > 0 ? `<div style="font-size:12px;color:var(--green);font-weight:700;">✅ ${ag.deals} deal${ag.deals!=1?'s':''} received</div>` : ''}
+      ${ag.notes ? `<div style="font-size:11px;color:var(--slate-light);font-style:italic;border-top:1px solid var(--cream-dark);padding-top:7px;margin-top:3px;">${ag.notes}</div>` : ''}
+      <div style="margin-top:6px;">
+        <select style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;border:1px solid var(--border);border-radius:3px;padding:4px 8px;background:var(--cream);color:var(--charcoal);cursor:pointer;width:100%;" onchange="updateAgentStatus(${i},this.value)">
+          ${Object.keys(STATUS_COLOUR).map(s=>`<option${s===ag.status?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function toggleAgentForm() { document.getElementById('agentForm').classList.toggle('open'); }
+
+function addAgent() {
+  const name   = document.getElementById('ag-name').value.trim();
+  const agency = document.getElementById('ag-agency').value.trim();
+  const type   = document.getElementById('ag-type').value;
+  const area   = document.getElementById('ag-area').value.trim();
+  const phone  = document.getElementById('ag-phone').value.trim();
+  const email  = document.getElementById('ag-email').value.trim();
+  const status = document.getElementById('ag-status').value;
+  const deals  = parseInt(document.getElementById('ag-deals').value) || 0;
+  const notes  = document.getElementById('ag-notes').value.trim();
+  if (!name) { alert('Please enter the contact name.'); return; }
+  if (!state.agents) state.agents = [];
+  state.agents.push({ name, agency, type, area, phone, email, status, deals, notes });
+  saveState();
+  document.getElementById('agentForm').classList.remove('open');
+  ['ag-name','ag-agency','ag-area','ag-phone','ag-email','ag-deals','ag-notes'].forEach(x => document.getElementById(x).value='');
+  renderAgents();
+}
+
+function updateAgentStatus(i, val) { state.agents[i].status = val; saveState(); renderAgents(); }
+
+function deleteAgent(i) {
+  if (confirm('Remove this contact?')) { state.agents.splice(i,1); saveState(); renderAgents(); }
+}
+
 function renderAll() {
   renderKPIs();
   renderMonthly();
@@ -1942,6 +2165,7 @@ function renderAll() {
   renderPipeline();
   renderModel();
   renderInvestors();
+  renderAgents();
   renderCharts();
 }
 
