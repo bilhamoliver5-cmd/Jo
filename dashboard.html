@@ -1541,7 +1541,7 @@ function switchTab(name) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   event.target.classList.add('active');
-  setTimeout(renderCharts, 50);
+  setTimeout(renderCharts, 100);
 }
 
 // ═══════════════════════════════════════
@@ -1915,11 +1915,16 @@ const CHART_DEFAULTS = {
 };
 
 function renderCharts() {
-  renderYieldChart('yieldChartOv');
-  renderYieldChart('yieldChartPipe');
-  renderMarketChart();
-  renderRateChart();
-  renderAllYieldChart();
+  // Only render a chart if its canvas is visible — avoids zero-dimension bug on hidden tabs
+  function visible(id) {
+    const el = document.getElementById(id);
+    return el && el.offsetParent !== null;
+  }
+  if (visible('yieldChartOv'))   renderYieldChart('yieldChartOv');
+  if (visible('yieldChartPipe')) renderYieldChart('yieldChartPipe');
+  if (visible('marketChartOv'))  renderMarketChart();
+  if (visible('rateChart'))      renderRateChart();
+  if (visible('allYieldChart'))  renderAllYieldChart();
 }
 
 function renderYieldChart(canvasId) {
